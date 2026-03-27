@@ -3,4 +3,5 @@ watchdog>=3.0.0
 flask>=3.0.0
 pyyaml>=6.0
 pywin32>=306
-pywebview>=4.0;platform_system=="Windows"
+pywebview>=4.4;platform_system=="Windows"
+pyinstaller>=6.0

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOCeal – Project VALE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-deep: #020c14;
+      --bg-panel: #061a2a;
+      --bg-card: #0a2540;
+      --cyan: #00d4ff;
+      --green: #00ff9d;
+      --yellow: #ffd600;
+      --red: #ff2d55;
+      --text: #c8dce8;
+      --text-dim: #5a7a8a;
+      --border: #0d3a5c;
+      --glow-cyan: 0 0 15px rgba(0,212,255,0.3);
+      --glow-green: 0 0 15px rgba(0,255,157,0.3);
+      --glow-red: 0 0 15px rgba(255,45,85,0.3);
+      --glow-yellow: 0 0 15px rgba(255,214,0,0.3);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px
+      );
+      pointer-events: none; z-index: 9999;
+    }
+    /* TOPBAR */
+    #topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px;
+      background: linear-gradient(180deg, #0a2540 0%, #061a2a 100%);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+      position: relative; z-index: 10;
+    }
+    .logo-group { display: flex; align-items: center; gap: 16px; }
+    .logo-main {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: 26px; color: var(--cyan);
+      text-shadow: 0 0 20px rgba(0,212,255,0.5);
+      letter-spacing: 4px;
+    }
+    .logo-sub {
+      font-family: 'Orbitron', sans-serif; font-weight: 400;
+      font-size: 11px; color: var(--text-dim);
+      letter-spacing: 6px; text-transform: uppercase;
+    }
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(0,255,157,0.08);
+      border: 1px solid rgba(0,255,157,0.3);
+      border-radius: 20px; padding: 6px 16px;
+      font-family: 'Share Tech Mono', monospace; font-size: 12px;
+      color: var(--green);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    .top-stats { display: flex; gap: 24px; align-items: center; }
+    .top-stat {
+      text-align: center;
+      padding: 4px 12px;
+      border-left: 1px solid var(--border);
+    }
+    .top-stat:first-child { border-left: none; }
+    .top-stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; color: var(--text-dim);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .top-stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--cyan);
+    }
+    .clock {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px; color: var(--text);
+      letter-spacing: 2px;
+    }
+
+    /* MAIN GRID */
+    #main {
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      grid-template-rows: 1fr auto;
+      gap: 12px;
+      padding: 12px;
+      height: calc(100vh - 65px);
+    }
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .panel::after {
+      content: '';
+      position: absolute; top:0; left:0; right:0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.5;
+    }
+    .panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 3px;
+      padding: 12px 16px 8px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,212,255,0.1);
+    }
+
+    /* LEFT PANEL: SCORE + THREATS */
+    #panel-score { grid-row: 1; grid-column: 1; display: flex; flex-direction: column; }
+    .score-section { padding: 16px; text-align: center; border-bottom: 1px solid var(--border); }
+    .score-ring-container { position: relative; width: 130px; height: 130px; margin: 0 auto 10px; }
+    .score-ring-container svg { width: 130px; height: 130px; transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: #0d3a5c; stroke-width: 8; }
+    .score-ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke 0.5s; }
+    .score-value {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900;
+    }
+    .score-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: var(--text-dim); letter-spacing: 2px;
+    }
+    .severity-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .severity-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 8px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .severity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .severity-count { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; margin-left: auto; }
+    .threat-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .threat-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px; margin-bottom: 4px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      border-left: 3px solid transparent;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    .threat-item:hover { background: rgba(0,212,255,0.05); }
+    .threat-item.critical { border-left-color: var(--red); }
+    .threat-item.high { border-left-color: var(--yellow); }
+    .threat-item.medium { border-left-color: var(--cyan); }
+    .threat-item.low { border-left-color: var(--green); }
+    .threat-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .threat-info { flex: 1; }
+    .threat-name { font-weight: 600; color: var(--text); font-size: 12px; }
+    .threat-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .threat-sev {
+      font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+      padding: 2px 6px; border-radius: 3px; white-space: nowrap; margin-top: 2px;
+    }
+    .sev-critical { background: rgba(255,45,85,0.2); color: var(--red); }
+    .sev-high { background: rgba(255,214,0,0.2); color: var(--yellow); }
+    .sev-medium { background: rgba(0,212,255,0.2); color: var(--cyan); }
+    .sev-low { background: rgba(0,255,157,0.2); color: var(--green); }
+
+    /* CENTER PANEL */
+    #panel-center { grid-row: 1; grid-column: 2; display: flex; flex-direction: column; }
+    .map-section { position: relative; flex: 1; min-height: 250px; }
+    #mapCanvas { width: 100%; height: 100%; display: block; }
+    .map-overlay-label {
+      position: absolute; font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; color: var(--cyan); pointer-events: none;
+      text-shadow: 0 0 5px rgba(0,212,255,0.5);
+    }
+    .event-section {
+      height: 220px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    #eventstream {
+      flex: 1; overflow-y: auto; padding: 8px;
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .event-line {
+      display: flex; gap: 8px; padding: 3px 6px; margin-bottom: 2px;
+      border-radius: 3px; animation: event-fade-in 0.3s ease;
+    }
+    @keyframes event-fade-in {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .event-time { color: var(--text-dim); white-space: nowrap; min-width: 65px; }
+    .event-tag {
+      padding: 1px 6px; border-radius: 3px; font-size: 10px;
+      font-weight: 700; white-space: nowrap; min-width: 60px; text-align: center;
+    }
+    .tag-block { background: rgba(255,45,85,0.2); color: var(--red); border: 1px solid rgba(255,45,85,0.3); }
+    .tag-detect { background: rgba(255,214,0,0.2); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+    .tag-monitor { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
+    .tag-ok { background: rgba(0,255,157,0.2); color: var(--green); border: 1px solid rgba(0,255,157,0.3); }
+    .event-msg { color: var(--text); flex: 1; }
+
+    /* RIGHT PANEL: ACTIONS */
+    #panel-actions { grid-row: 1; grid-column: 3; display: flex; flex-direction: column; }
+    .action-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .action-item {
+      display: flex; gap: 10px; padding: 10px;
+      margin-bottom: 4px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      transition: background 0.2s;
+    }
+    .action-item:hover { background: rgba(0,212,255,0.05); }
+    .action-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+    .action-info { flex: 1; }
+    .action-title { font-weight: 600; font-size: 12px; color: var(--text); }
+    .action-detail { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .action-time {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: var(--text-dim); white-space: nowrap; align-self: flex-start;
+    }
+
+    /* BOTTOM ROW */
+    #bottom-row {
+      grid-column: 1 / -1; grid-row: 2;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 12px; height: 110px;
+    }
+    .mini-panel {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .mini-panel::after {
+      content: ''; position: absolute; top:0; left:0; right:0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.3;
+    }
+    .mini-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; color: var(--text-dim);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .mini-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px; font-weight: 700; color: var(--cyan);
+    }
+    .mini-spark { height: 30px; width: 100%; }
+    .mini-spark svg { width: 100%; height: 100%; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      #main { grid-template-columns: 1fr; grid-template-rows: auto; }
+      #panel-score, #panel-actions { max-height: 400px; }
+      #bottom-row { grid-template-columns: repeat(3, 1fr); height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo-group">
+      <div>
+        <div class="logo-main">SOCEAL</div>
+        <div class="logo-sub">Project VALE</div>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        SYSTEM ACTIVE
+      </div>
+    </div>
+    <div class="top-stats">
+      <div class="top-stat">
+        <div class="top-stat-label">Blocked Today</div>
+        <div class="top-stat-val" id="stat-blocked">12</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Active Monitors</div>
+        <div class="top-stat-val" id="stat-monitors">3</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Threats (1h)</div>
+        <div class="top-stat-val" id="stat-threats">7</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Uptime</div>
+        <div class="top-stat-val" id="stat-uptime">00:00:00</div>
+      </div>
+    </div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div id="main">
+    <!-- LEFT: SCORE + THREATS -->
+    <div id="panel-score" class="panel">
+      <div class="panel-title">Security Overview</div>
+      <div class="score-section">
+        <div class="score-ring-container">
+          <svg viewBox="0 0 130 130">
+            <circle class="score-ring-bg" cx="65" cy="65" r="54"/>
+            <circle class="score-ring-fg" id="score-ring" cx="65" cy="65" r="54"
+              stroke="var(--green)" stroke-dasharray="339.3" stroke-dashoffset="50"/>
+          </svg>
+          <div class="score-value" id="score-value">85</div>
+        </div>
+        <div class="score-label">SECURITY SCORE</div>
+      </div>
+      <div class="severity-grid">
+        <div class="severity-item">
+          <div class="severity-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div>
+          CRITICAL <span class="severity-count" id="sev-critical" style="color:var(--red)">2</span>
+        </div>
+        <div class="severity-item">
+          <div class="severity-dot" style="background:var(--yellow);box-shadow:0 0 6px var(--yellow)"></div>
+          HIGH <span class="severity-count" id="sev-high" style="color:var(--yellow)">3</span>
+        </div>
+        <div class="severity-item">
+          <div class="severity-dot" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></div>
+          MEDIUM <span class="severity-count" id="sev-medium" style="color:var(--cyan)">5</span>
+        </div>
+        <div class="severity-item">
+          <div class="severity-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          LOW <span class="severity-count" id="sev-low" style="color:var(--green)">8</span>
+        </div>
+      </div>
+      <div class="panel-title" style="padding-top:8px">Active Threats</div>
+      <div class="threat-list" id="threat-list"></div>
+    </div>
+
+    <!-- CENTER: MAP + EVENTS -->
+    <div id="panel-center" class="panel">
+      <div class="panel-title">Network Threat Map</div>
+      <div class="map-section">
+        <canvas id="mapCanvas"></canvas>
+      </div>
+      <div class="event-section">
+        <div class="panel-title">Event Stream</div>
+        <div id="eventstream"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ACTIONS -->
+    <div id="panel-actions" class="panel">
+      <div class="panel-title">Countermeasures</div>
+      <div class="action-list" id="action-list"></div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div id="bottom-row">
+      <div class="mini-panel">
+        <div class="mini-label">Events / Min</div>
+        <div class="mini-value" id="mini-epm">142</div>
+        <div class="mini-spark" id="spark-epm"></div>
+      </div>
+      <div class="mini-panel">
+        <div class="mini-label">Processes Watched</div>
+        <div class="mini-value" id="mini-proc">238</div>
+        <div class="mini-spark" id="spark-proc"></div>
+      </div>
+      <div class="mini-panel">
+        <div class="mini-label">IPs Blocked</div>
+        <div class="mini-value" id="mini-ips">12</div>
+        <div class="mini-spark" id="spark-ips"></div>
+      </div>
+      <div class="mini-panel">
+        <div class="mini-label">Files in Quarantine</div>
+        <div class="mini-value" id="mini-quarantine">3</div>
+        <div class="mini-spark" id="spark-quarantine"></div>
+      </div>
+      <div class="mini-panel">
+        <div class="mini-label">Net Connections</div>
+        <div class="mini-value" id="mini-net">87</div>
+        <div class="mini-spark" id="spark-net"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ============================================================
+     SOCeal – Project VALE Dashboard
+     Demo mode with backend integration hooks
+     ============================================================ */
+  (function() {
+    'use strict';
+
+    // ── Backend integration namespace ──
+    window.SOCeal = {
+      _demoMode: { threats: true, actions: true, stats: true, events: true, score: true },
+
+      updateThreats(threats) {
+        this._demoMode.threats = false;
+        renderThreats(threats);
+      },
+      updateActions(actions) {
+        this._demoMode.actions = false;
+        renderActions(actions);
+      },
+      updateStats(stats) {
+        this._demoMode.stats = false;
+        applyStats(stats);
+      },
+      addEvent(ev) {
+        addEventLine(ev.time || nowTime(), ev.tag || 'MONITOR', ev.message || '');
+      },
+      updateScore(score) {
+        this._demoMode.score = false;
+        setScore(score);
+      }
+    };
+
+    // ── Utility ──
+    function nowTime() {
+      const d = new Date();
+      return d.toTimeString().slice(0, 8);
+    }
+    function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+    function pick(arr) { return arr[randInt(0, arr.length - 1)]; }
+
+    // ── Clock ──
+    function updateClock() {
+      document.getElementById('clock').textContent = nowTime();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── Uptime ──
+    let uptimeSec = 0;
+    function updateUptime() {
+      uptimeSec++;
+      const h = String(Math.floor(uptimeSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((uptimeSec % 3600) / 60)).padStart(2, '0');
+      const s = String(uptimeSec % 60).padStart(2, '0');
+      document.getElementById('stat-uptime').textContent = h + ':' + m + ':' + s;
+    }
+    setInterval(updateUptime, 1000);
+
+    // ── Security Score ──
+    function setScore(score) {
+      const circumference = 2 * Math.PI * 54; // ~339.3
+      const offset = circumference * (1 - score / 100);
+      const ring = document.getElementById('score-ring');
+      ring.style.strokeDashoffset = offset;
+      if (score >= 75) ring.setAttribute('stroke', 'var(--green)');
+      else if (score >= 50) ring.setAttribute('stroke', 'var(--yellow)');
+      else ring.setAttribute('stroke', 'var(--red)');
+      document.getElementById('score-value').textContent = score;
+      document.getElementById('score-value').style.color =
+        score >= 75 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+    }
+    setScore(85);
+
+    // ── Threats ──
+    const demoThreats = [
+      { name: 'Brute-Force Login', meta: '185.220.101.34 · 47 attempts', severity: 'critical' },
+      { name: 'Mimikatz Detected', meta: 'mimikatz.exe · PID 4412', severity: 'critical' },
+      { name: 'Encoded PowerShell', meta: 'powershell.exe -Enc · PID 7821', severity: 'high' },
+      { name: 'Suspicious Outbound', meta: '→ 45.33.32.156:4444 · nc.exe', severity: 'high' },
+      { name: 'Temp Executable', meta: 'AppData\\Local\\Temp\\xk2f.exe', severity: 'high' },
+      { name: 'New Service Installed', meta: 'svc_update.exe · EventID 7045', severity: 'medium' },
+      { name: 'RDP Login Detected', meta: '10.0.0.5 · Logon Type 10', severity: 'medium' },
+      { name: 'USB Device Connected', meta: 'KINGSTON DT · E:', severity: 'medium' },
+      { name: 'Scheduled Task Created', meta: 'schtasks · UpdateCheck', severity: 'medium' },
+      { name: 'Windows Update', meta: 'KB5034441 · Success', severity: 'low' },
+      { name: 'User Logon', meta: 'akoj2 · Interactive', severity: 'low' },
+    ];
+
+    function renderThreats(threats) {
+      const el = document.getElementById('threat-list');
+      el.innerHTML = '';
+      const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+      threats.forEach(t => {
+        counts[t.severity] = (counts[t.severity] || 0) + 1;
+        const colors = { critical: 'var(--red)', high: 'var(--yellow)', medium: 'var(--cyan)', low: 'var(--green)' };
+        el.innerHTML += `
+          <div class="threat-item ${t.severity}">
+            <div class="threat-dot" style="background:${colors[t.severity]};box-shadow:0 0 6px ${colors[t.severity]}"></div>
+            <div class="threat-info">
+              <div class="threat-name">${t.name}</div>
+              <div class="threat-meta">${t.meta}</div>
+            </div>
+            <div class="threat-sev sev-${t.severity}">${t.severity.toUpperCase()}</div>
+          </div>`;
+      });
+      document.getElementById('sev-critical').textContent = counts.critical;
+      document.getElementById('sev-high').textContent = counts.high;
+      document.getElementById('sev-medium').textContent = counts.medium;
+      document.getElementById('sev-low').textContent = counts.low;
+    }
+    renderThreats(demoThreats);
+
+    // ── Actions ──
+    const demoActions = [
+      { icon: '⚡', title: 'Process Killed', detail: 'mimikatz.exe · PID 4412', time: '14:32' },
+      { icon: '🔒', title: 'IP Blocked', detail: '185.220.101.34 · Inbound', time: '14:31' },
+      { icon: '⚡', title: 'Process Killed', detail: 'nc.exe · PID 2201', time: '14:28' },
+      { icon: '📦', title: 'File Quarantined', detail: 'xk2f.exe · SHA256: a3f2...', time: '14:25' },
+      { icon: '🔒', title: 'IP Blocked', detail: '45.33.32.156 · Outbound C2', time: '14:22' },
+      { icon: '⚡', title: 'Process Killed', detail: 'powershell.exe · PID 7821', time: '14:20' },
+      { icon: '✅', title: 'Allowed', detail: 'chrome.exe · Whitelisted', time: '14:18' },
+      { icon: '🔒', title: 'IP Blocked', detail: '91.219.236.18 · Scanner', time: '14:15' },
+      { icon: '📦', title: 'File Quarantined', detail: 'payload.scr · Downloads', time: '14:12' },
+      { icon: '✅', title: 'Allowed', detail: 'svchost.exe · System', time: '14:10' },
+      { icon: '⚡', title: 'Process Killed', detail: 'plink.exe · PID 5540', time: '14:08' },
+      { icon: '🔒', title: 'IP Blocked', detail: '103.75.201.2 · Brute-force', time: '14:05' },
+    ];
+
+    function renderActions(actions) {
+      const el = document.getElementById('action-list');
+      el.innerHTML = '';
+      actions.forEach(a => {
+        el.innerHTML += `
+          <div class="action-item">
+            <div class="action-icon">${a.icon}</div>
+            <div class="action-info">
+              <div class="action-title">${a.title}</div>
+              <div class="action-detail">${a.detail}</div>
+            </div>
+            <div class="action-time">${a.time}</div>
+          </div>`;
+      });
+    }
+    renderActions(demoActions);
+
+    // ── Event Stream ──
+    const eventStream = document.getElementById('eventstream');
+    const sampleEvents = [
+      { tag: 'BLOCK', msg: 'Blocked inbound from 185.220.101.34 (brute-force)' },
+      { tag: 'DETECT', msg: 'Suspicious process: mimikatz.exe PID 4412' },
+      { tag: 'BLOCK', msg: 'Killed process: nc.exe PID 2201 (reverse shell)' },
+      { tag: 'MONITOR', msg: 'New TCP connection → 142.250.80.46:443 (google.com)' },
+      { tag: 'OK', msg: 'Windows Defender scan completed — no threats' },
+      { tag: 'DETECT', msg: 'Encoded PowerShell detected PID 7821' },
+      { tag: 'MONITOR', msg: 'Event log: logon success for akoj2 (EventID 4624)' },
+      { tag: 'BLOCK', msg: 'Quarantined: AppData\\Local\\Temp\\xk2f.exe' },
+      { tag: 'OK', msg: 'Firewall rule check passed — 12 SOCeal rules active' },
+      { tag: 'DETECT', msg: 'New service installed: svc_update.exe (EventID 7045)' },
+    ];
+
+    function addEventLine(time, tag, msg) {
+      const tagClass = { BLOCK: 'tag-block', DETECT: 'tag-detect', MONITOR: 'tag-monitor', OK: 'tag-ok' };
+      const div = document.createElement('div');
+      div.className = 'event-line';
+      div.innerHTML = `
+        <span class="event-time">${time}</span>
+        <span class="event-tag ${tagClass[tag] || 'tag-monitor'}">${tag}</span>
+        <span class="event-msg">${msg}</span>`;
+      eventStream.prepend(div);
+      // Keep max 100 events
+      while (eventStream.children.length > 100) eventStream.removeChild(eventStream.lastChild);
+    }
+
+    // Initial events
+    sampleEvents.forEach((e, i) => {
+      const t = new Date(Date.now() - (sampleEvents.length - i) * 3000);
+      addEventLine(t.toTimeString().slice(0, 8), e.tag, e.msg);
+    });
+
+    // Random event generator
+    const randomMsgs = [
+      { tag: 'MONITOR', msg: 'DNS query: api.github.com → 140.82.121.6' },
+      { tag: 'MONITOR', msg: 'TCP connection closed → 52.84.12.33:443' },
+      { tag: 'OK', msg: 'Process scan: 238 processes — all clear' },
+      { tag: 'MONITOR', msg: 'Event log: service start (EventID 7036)' },
+      { tag: 'DETECT', msg: 'Unusual outbound port: svchost.exe → :8443' },
+      { tag: 'OK', msg: 'File integrity check: System32 — no changes' },
+      { tag: 'MONITOR', msg: 'New UDP socket: chrome.exe → 8.8.8.8:53' },
+      { tag: 'MONITOR', msg: 'Registry access: HKLM\\Software\\Microsoft\\Windows' },
+      { tag: 'OK', msg: 'Scheduled scan completed — 0 threats found' },
+      { tag: 'DETECT', msg: 'High CPU process: unknown_svc.exe (92% CPU)' },
+      { tag: 'MONITOR', msg: 'Event log: audit policy change (EventID 4719)' },
+      { tag: 'BLOCK', msg: 'Blocked outbound to 91.219.236.18:445 (SMB scan)' },
+      { tag: 'OK', msg: 'Certificate validation: *.microsoft.com — valid' },
+      { tag: 'MONITOR', msg: 'New connection: msedge.exe → 204.79.197.200:443' },
+    ];
+
+    setInterval(() => {
+      if (!window.SOCeal._demoMode.events) return;
+      const e = pick(randomMsgs);
+      addEventLine(nowTime(), e.tag, e.msg);
+    }, randInt(1200, 2500));
+
+    // ── Stats / Sparklines ──
+    const sparkData = {
+      epm: [80, 110, 95, 142, 130, 155, 142, 128, 145, 138, 160, 142],
+      proc: [220, 225, 231, 238, 240, 235, 238, 242, 239, 238, 236, 238],
+      ips: [8, 8, 9, 10, 10, 11, 11, 12, 12, 12, 12, 12],
+      quarantine: [1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3],
+      net: [72, 78, 85, 91, 88, 82, 79, 84, 90, 87, 85, 87],
+    };
+
+    function createSparkline(containerId, data, color) {
+      const container = document.getElementById(containerId);
+      const w = 160, h = 30;
+      const max = Math.max(...data) * 1.1 || 1;
+      const min = Math.min(...data) * 0.9;
+      const range = max - min || 1;
+      const points = data.map((v, i) => {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return `${x},${y}`;
+      }).join(' ');
+      const fillPoints = `0,${h} ${points} ${w},${h}`;
+      const gradId = 'grad-' + containerId;
+      container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon points="${fillPoints}" fill="url(#${gradId})"/>
+          <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5"
+            stroke-linejoin="round" filter="drop-shadow(0 0 3px ${color})"/>
+        </svg>`;
+    }
+
+    function applyStats(stats) {
+      if (stats.events_per_minute !== undefined) document.getElementById('mini-epm').textContent = stats.events_per_minute;
+      if (stats.processes_watched !== undefined) document.getElementById('mini-proc').textContent = stats.processes_watched;
+      if (stats.ips_blocked !== undefined) {
+        document.getElementById('mini-ips').textContent = stats.ips_blocked;
+        document.getElementById('stat-blocked').textContent = stats.ips_blocked;
+      }
+      if (stats.files_quarantined !== undefined) document.getElementById('mini-quarantine').textContent = stats.files_quarantined;
+      if (stats.net_connections !== undefined) document.getElementById('mini-net').textContent = stats.net_connections;
+      if (stats.threats_1h !== undefined) document.getElementById('stat-threats').textContent = stats.threats_1h;
+      if (stats.sparklines) {
+        Object.keys(stats.sparklines).forEach(k => {
+          if (sparkData[k]) sparkData[k] = stats.sparklines[k];
+        });
+      }
+      renderSparklines();
+    }
+
+    function renderSparklines() {
+      createSparkline('spark-epm', sparkData.epm, '#00d4ff');
+      createSparkline('spark-proc', sparkData.proc, '#00ff9d');
+      createSparkline('spark-ips', sparkData.ips, '#ff2d55');
+      createSparkline('spark-quarantine', sparkData.quarantine, '#ffd600');
+      createSparkline('spark-net', sparkData.net, '#00d4ff');
+    }
+    renderSparklines();
+
+    // Demo stat updates
+    setInterval(() => {
+      if (!window.SOCeal._demoMode.stats) return;
+      const epm = randInt(120, 170);
+      sparkData.epm.push(epm); sparkData.epm.shift();
+      document.getElementById('mini-epm').textContent = epm;
+      const proc = randInt(230, 250);
+      sparkData.proc.push(proc); sparkData.proc.shift();
+      document.getElementById('mini-proc').textContent = proc;
+      const net = randInt(75, 100);
+      sparkData.net.push(net); sparkData.net.shift();
+      document.getElementById('mini-net').textContent = net;
+      renderSparklines();
+    }, 4000);
+
+    // ── Network Threat Map (Canvas) ──
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d');
+    let cw, ch;
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      cw = canvas.width; ch = canvas.height;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const centerX = () => canvas.width / window.devicePixelRatio / 2;
+    const centerY = () => canvas.height / window.devicePixelRatio / 2;
+
+    const threatNodes = [
+      { label: '185.220.101.34', loc: 'DE/BERLIN', angle: -30, dist: 0.38, color: '#ff2d55', pulse: 0 },
+      { label: '45.33.32.156', loc: 'US/CALIFORNIA', angle: 200, dist: 0.42, color: '#ff2d55', pulse: 0 },
+      { label: '91.219.236.18', loc: 'NL/AMSTERDAM', angle: -70, dist: 0.35, color: '#ffd600', pulse: 0 },
+      { label: '103.75.201.2', loc: 'CN/BEIJING', angle: 50, dist: 0.4, color: '#ffd600', pulse: 0 },
+      { label: '10.0.0.5', loc: 'LOCAL/LAN', angle: 150, dist: 0.22, color: '#00d4ff', pulse: 0 },
+      { label: '142.250.80.46', loc: 'US/GOOGLE', angle: 110, dist: 0.33, color: '#00ff9d', pulse: 0 },
+    ];
+
+    let dashOffset = 0;
+    const pingCircles = [];
+
+    function spawnPing(x, y, color) {
+      pingCircles.push({ x, y, color, radius: 3, alpha: 1 });
+    }
+
+    function drawMap(time) {
+      const w = canvas.width / window.devicePixelRatio;
+      const h = canvas.height / window.devicePixelRatio;
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+      ctx.lineWidth = 0.5;
+      for (let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+      for (let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+      // Concentric rings
+      const cx = centerX(), cy = centerY();
+      for (let r = 60; r < Math.max(w, h); r += 80) {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,212,255,0.05)'; ctx.lineWidth = 0.5; ctx.stroke();
+      }
+
+      dashOffset -= 0.5;
+
+      // Draw connections and nodes
+      threatNodes.forEach((node, i) => {
+        const rad = (node.angle * Math.PI) / 180;
+        const maxDist = Math.min(w, h) * node.dist;
+        const nx = cx + Math.cos(rad) * maxDist;
+        const ny = cy + Math.sin(rad) * maxDist;
+
+        // Animated dashed line
+        ctx.beginPath();
+        ctx.moveTo(nx, ny);
+        ctx.lineTo(cx, cy);
+        ctx.strokeStyle = node.color + '40';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 8]);
+        ctx.lineDashOffset = dashOffset + i * 10;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Node glow
+        const glowSize = 20 + Math.sin(time / 800 + i) * 5;
+        const grd = ctx.createRadialGradient(nx, ny, 2, nx, ny, glowSize);
+        grd.addColorStop(0, node.color + '60');
+        grd.addColorStop(1, node.color + '00');
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(nx, ny, glowSize, 0, Math.PI * 2); ctx.fill();
+
+        // Node dot
+        ctx.beginPath(); ctx.arc(nx, ny, 4, 0, Math.PI * 2);
+        ctx.fillStyle = node.color; ctx.fill();
+        ctx.strokeStyle = node.color; ctx.lineWidth = 1; ctx.stroke();
+
+        // Labels
+        ctx.font = '9px "Share Tech Mono"';
+        ctx.fillStyle = node.color;
+        ctx.fillText(node.label, nx + 8, ny - 6);
+        ctx.fillStyle = 'rgba(200,220,232,0.5)';
+        ctx.fillText(node.loc, nx + 8, ny + 6);
+
+        // Spawn pings periodically
+        node.pulse += 1;
+        if (node.pulse > 120 + i * 30) {
+          spawnPing(nx, ny, node.color);
+          node.pulse = 0;
+        }
+      });
+
+      // Center node ("YOU")
+      const cgrd = ctx.createRadialGradient(cx, cy, 3, cx, cy, 30 + Math.sin(time / 500) * 5);
+      cgrd.addColorStop(0, '#00d4ff60');
+      cgrd.addColorStop(1, '#00d4ff00');
+      ctx.fillStyle = cgrd;
+      ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#00d4ff'; ctx.fill();
+      ctx.font = 'bold 10px "Orbitron"';
+      ctx.fillStyle = '#00d4ff';
+      ctx.textAlign = 'center';
+      ctx.fillText('YOU', cx, cy - 14);
+      ctx.textAlign = 'left';
+
+      // Ping circles
+      for (let i = pingCircles.length - 1; i >= 0; i--) {
+        const p = pingCircles[i];
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = p.color + Math.floor(p.alpha * 255).toString(16).padStart(2, '0');
+        ctx.lineWidth = 1.5; ctx.stroke();
+        p.radius += 0.8;
+        p.alpha -= 0.015;
+        if (p.alpha <= 0) pingCircles.splice(i, 1);
+      }
+
+      requestAnimationFrame(drawMap);
+    }
+    requestAnimationFrame(drawMap);
+
+    // ── Backend polling (when served by Flask) ──
+    const API_BASE = window.location.origin;
+    let backendConnected = false;
+
+    async function pollBackend() {
+      try {
+        const [threats, actions, stats] = await Promise.all([
+          fetch(API_BASE + '/api/threats').then(r => r.ok ? r.json() : null),
+          fetch(API_BASE + '/api/actions').then(r => r.ok ? r.json() : null),
+          fetch(API_BASE + '/api/stats').then(r => r.ok ? r.json() : null),
+        ]);
+        if (threats) { backendConnected = true; window.SOCeal.updateThreats(threats); }
+        if (actions) { window.SOCeal.updateActions(actions); }
+        if (stats) {
+          window.SOCeal.updateStats(stats);
+          if (stats.security_score !== undefined) window.SOCeal.updateScore(stats.security_score);
+        }
+      } catch (e) {
+        // Backend not available — demo mode continues
+        if (backendConnected) {
+          backendConnected = false;
+          window.SOCeal._demoMode = { threats: true, actions: true, stats: true, events: true, score: true };
+        }
+      }
+    }
+
+    // Poll every 3 seconds
+    setInterval(pollBackend, 3000);
+    // Initial poll after 1 second
+    setTimeout(pollBackend, 1000);
+
+  })();
+  </script>
+</body>
+</html>

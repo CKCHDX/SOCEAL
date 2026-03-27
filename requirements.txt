@@ -1,0 +1,7 @@
+flask>=2.3
+psutil>=5.9
+watchdog>=3.0
+pywin32>=306; sys_platform == 'win32'
+pyyaml>=6.0
+colorama>=0.4
+pywebview>=4.4

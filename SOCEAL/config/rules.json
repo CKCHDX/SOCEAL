@@ -1,0 +1,102 @@
+{
+  "rules": [
+    {
+      "id": "LOGIN_BRUTEFORCE",
+      "name": "Brute-Force Login",
+      "type": "eventlog",
+      "event_id": 4625,
+      "window_seconds": 60,
+      "threshold": 10,
+      "action": "block_ip",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "ACCOUNT_LOCKOUT",
+      "name": "Account Lockout",
+      "type": "eventlog",
+      "event_id": 4740,
+      "action": "log",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "SUSPICIOUS_PROCESS",
+      "name": "Suspicious Process Detected",
+      "type": "process",
+      "patterns": [
+        "mimikatz", "cobaltstrike", "beacon.exe",
+        "nc.exe", "nc64.exe", "ncat.exe",
+        "plink.exe", "psexec.exe", "psexec64.exe",
+        "procdump.exe", "lazagne.exe", "rubeus.exe",
+        "sharphound.exe", "bloodhound.exe", "chisel.exe"
+      ],
+      "action": "kill_process",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "TEMP_EXECUTABLE",
+      "name": "Executable in Temp Directory",
+      "type": "process",
+      "patterns": ["\\Temp\\", "\\AppData\\Local\\Temp\\"],
+      "action": "log",
+      "severity": "high",
+      "enabled": true
+    },
+    {
+      "id": "POWERSHELL_ENCODED",
+      "name": "Encoded PowerShell Command",
+      "type": "process",
+      "patterns": ["-EncodedCommand", "-enc "],
+      "action": "kill_process",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "NEW_SERVICE",
+      "name": "New Service Installed",
+      "type": "eventlog",
+      "event_id": 7045,
+      "action": "log",
+      "severity": "medium",
+      "enabled": true
+    },
+    {
+      "id": "FIREWALL_DISABLED",
+      "name": "Firewall Profile Disabled",
+      "type": "eventlog",
+      "event_id": 2003,
+      "action": "log",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "AUDIT_LOG_CLEARED",
+      "name": "Audit Log Cleared",
+      "type": "eventlog",
+      "event_id": 1102,
+      "action": "log",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "id": "SUSPICIOUS_DOWNLOAD",
+      "name": "Suspicious File in Downloads",
+      "type": "file",
+      "patterns": [".exe", ".scr", ".pif", ".bat", ".cmd", ".ps1", ".vbs", ".hta"],
+      "action": "quarantine",
+      "severity": "high",
+      "enabled": true
+    },
+    {
+      "id": "RDP_LOGIN",
+      "name": "RDP Login Detected",
+      "type": "eventlog",
+      "event_id": 4624,
+      "action": "log",
+      "severity": "medium",
+      "enabled": true
+    }
+  ]
+}

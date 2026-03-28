@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOCeal – Project VALE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-deep: #020c14;
+      --bg-panel: #061a2a;
+      --bg-card: #0a2540;
+      --cyan: #00d4ff;
+      --green: #00ff9d;
+      --yellow: #ffd600;
+      --red: #ff2d55;
+      --text: #c8dce8;
+      --text-dim: #5a7a8a;
+      --border: #0d3a5c;
+      --glow-cyan: 0 0 15px rgba(0,212,255,0.3);
+      --glow-green: 0 0 15px rgba(0,255,157,0.3);
+      --glow-red: 0 0 15px rgba(255,45,85,0.3);
+      --glow-yellow: 0 0 15px rgba(255,214,0,0.3);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg-deep);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(0,212,255,0.03) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 30%, rgba(0,255,157,0.02) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 80%, rgba(255,45,85,0.015) 0%, transparent 50%);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px
+      );
+      pointer-events: none; z-index: 9999;
+      animation: scanline-scroll 8s linear infinite;
+    }
+    @keyframes scanline-scroll {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(4px); }
+    }
+    /* Moving scanline beam */
+    body::after {
+      content: '';
+      position: fixed; top: -2px; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.4) 40%, rgba(0,212,255,0.8) 50%, rgba(0,212,255,0.4) 60%, transparent 100%);
+      z-index: 9998; pointer-events: none;
+      animation: scanbeam 6s linear infinite;
+      box-shadow: 0 0 20px rgba(0,212,255,0.3), 0 0 60px rgba(0,212,255,0.1);
+    }
+    @keyframes scanbeam {
+      0% { top: -2px; opacity: 0; }
+      5% { opacity: 1; }
+      95% { opacity: 1; }
+      100% { top: 100vh; opacity: 0; }
+    }
+    /* Background particle canvas */
+    #particles-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    /* Panel entrance animation */
+    @keyframes panel-slide-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes panel-glow-in {
+      0% { box-shadow: none; }
+      100% { box-shadow: inset 0 1px 0 rgba(0,212,255,0.1), 0 0 20px rgba(0,0,0,0.3); }
+    }
+    /* Number count-up flash */
+    @keyframes num-flash {
+      0% { text-shadow: 0 0 20px currentColor; }
+      100% { text-shadow: none; }
+    }
+    .num-updated { animation: num-flash 0.6s ease-out; }
+    /* Breathing glow for panels */
+    @keyframes breathe-glow {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(0,212,255,0.08), 0 0 15px rgba(0,0,0,0.3); }
+      50% { box-shadow: inset 0 1px 0 rgba(0,212,255,0.15), 0 0 25px rgba(0,212,255,0.05); }
+    }
+
+    /* TOPBAR */
+    #topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px;
+      background: linear-gradient(180deg, #0a2540 0%, #061a2a 100%);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(0,212,255,0.1) inset;
+      position: relative; z-index: 10;
+      animation: panel-slide-up 0.6s ease-out;
+    }
+    .logo-group { display: flex; align-items: center; gap: 16px; }
+    .logo-main {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: 26px; color: var(--cyan);
+      text-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2);
+      letter-spacing: 4px;
+      animation: logo-glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes logo-glow {
+      0% { text-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2); filter: brightness(1); }
+      100% { text-shadow: 0 0 30px rgba(0,212,255,0.7), 0 0 60px rgba(0,212,255,0.3), 0 0 80px rgba(0,212,255,0.1); filter: brightness(1.1); }
+    }
+    .logo-sub {
+      font-family: 'Orbitron', sans-serif; font-weight: 400;
+      font-size: 11px; color: var(--text-dim);
+      letter-spacing: 6px; text-transform: uppercase;
+    }
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(0,255,157,0.08);
+      border: 1px solid rgba(0,255,157,0.3);
+      border-radius: 20px; padding: 6px 16px;
+      font-family: 'Share Tech Mono', monospace; font-size: 12px;
+      color: var(--green);
+      transition: all 0.3s;
+    }
+    .status-badge.active-mode {
+      background: rgba(255,45,85,0.08);
+      border-color: rgba(255,45,85,0.3);
+      color: var(--red);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s infinite;
+      transition: all 0.3s;
+    }
+    .status-badge.active-mode .status-dot {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Mode Toggle */
+    .mode-toggle {
+      display: flex; align-items: center; gap: 10px;
+      margin-left: 12px;
+    }
+    .toggle-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 2px;
+      color: var(--text-dim);
+    }
+    .toggle-label.active-label { color: var(--cyan); font-weight: 700; }
+    .toggle-switch {
+      position: relative;
+      width: 40px; height: 20px;
+      cursor: pointer;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,255,157,0.2);
+      border: 1px solid rgba(0,255,157,0.4);
+      border-radius: 20px;
+      transition: all 0.3s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      transition: all 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background: rgba(255,45,85,0.2);
+      border-color: rgba(255,45,85,0.4);
+    }
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    .top-stats { display: flex; gap: 24px; align-items: center; }
+    .top-stat {
+      text-align: center;
+      padding: 4px 12px;
+      border-left: 1px solid var(--border);
+    }
+    .top-stat:first-child { border-left: none; }
+    .top-stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; color: var(--text-dim);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .top-stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--cyan);
+      text-shadow: 0 0 8px rgba(0,212,255,0.3);
+      transition: text-shadow 0.3s;
+    }
+    .clock {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px; color: var(--text);
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(200,220,232,0.2);
+      animation: clock-blink 1s step-end infinite;
+    }
+    @keyframes clock-blink {
+      50% { text-shadow: 0 0 15px rgba(0,212,255,0.4); }
+    }
+
+    /* TAB BAR */
+    .tab-bar {
+      display: flex; gap: 2px; padding: 8px 12px 0;
+      background: var(--bg-deep);
+    }
+    .tab-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 1px;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.3);
+      color: var(--text-dim);
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--cyan); background: rgba(0,212,255,0.05); }
+    .tab-btn.active {
+      background: var(--bg-panel);
+      color: var(--cyan);
+      border-color: var(--border);
+      border-bottom-color: var(--bg-panel);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; }
+
+    /* MAIN GRID */
+    #main {
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      grid-template-rows: 1fr auto;
+      gap: 12px;
+      padding: 12px;
+      height: calc(100vh - 65px);
+    }
+    #main.tabbed-view {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr auto;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(6,26,42,0.95) 0%, rgba(4,18,30,0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      animation: panel-slide-up 0.8s ease-out both, breathe-glow 4s ease-in-out 1s infinite;
+    }
+    .panel:nth-child(1) { animation-delay: 0.1s, 1s; }
+    .panel:nth-child(2) { animation-delay: 0.2s, 1.5s; }
+    .panel:nth-child(3) { animation-delay: 0.3s, 2s; }
+    .panel::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.03), transparent);
+      animation: panel-shimmer 8s ease-in-out infinite;
+      pointer-events: none; z-index: 1;
+    }
+    @keyframes panel-shimmer {
+      0%, 100% { left: -100%; }
+      50% { left: 100%; }
+    }
+    .panel::after {
+      content: '';
+      position: absolute; top:0; left:0; right:0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.6;
+      z-index: 2;
+    }
+    .panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 3px;
+      padding: 12px 16px 8px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,212,255,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* LEFT PANEL: SCORE + THREATS */
+    #panel-score { grid-row: 1; grid-column: 1; display: flex; flex-direction: column; }
+    .score-section { padding: 16px; text-align: center; border-bottom: 1px solid var(--border); }
+    .score-ring-container { position: relative; width: 130px; height: 130px; margin: 0 auto 10px; }
+    .score-ring-container svg { width: 130px; height: 130px; transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: #0d3a5c; stroke-width: 8; }
+    .score-ring-fg {
+      fill: none; stroke-width: 8; stroke-linecap: round;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1), stroke 0.5s;
+      filter: drop-shadow(0 0 6px currentColor);
+    }
+    .score-value {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900;
+      animation: score-pulse 2s ease-in-out infinite alternate;
+    }
+    @keyframes score-pulse {
+      0% { text-shadow: 0 0 10px currentColor; }
+      100% { text-shadow: 0 0 25px currentColor, 0 0 50px rgba(0,212,255,0.2); }
+    }
+    .score-ring-container::after {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      width: 120px; height: 120px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(0,212,255,0.1);
+      animation: ring-rotate 12s linear infinite;
+    }
+    @keyframes ring-rotate {
+      0% { transform: translate(-50%, -50%) rotate(0deg); border-color: rgba(0,212,255,0.15); }
+      50% { border-color: rgba(0,255,157,0.1); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); border-color: rgba(0,212,255,0.15); }
+    }
+    .score-label {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: var(--text-dim); letter-spacing: 2px;
+    }
+    .severity-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .severity-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 8px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .severity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; animation: sev-dot-pulse 2s ease-in-out infinite; }
+    @keyframes sev-dot-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+    .severity-count { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; margin-left: auto; }
+    .threat-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .threat-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px; margin-bottom: 4px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      border-left: 3px solid transparent;
+      font-size: 12px;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+      animation: threat-slide-in 0.4s ease-out;
+    }
+    @keyframes threat-slide-in {
+      from { opacity: 0; transform: translateX(-15px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .threat-item:hover { background: rgba(0,212,255,0.08); transform: translateX(3px); box-shadow: -2px 0 10px rgba(0,212,255,0.1); }
+    .threat-item.critical { border-left-color: var(--red); }
+    .threat-item.high { border-left-color: var(--yellow); }
+    .threat-item.medium { border-left-color: var(--cyan); }
+    .threat-item.low { border-left-color: var(--green); }
+    .threat-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .threat-info { flex: 1; }
+    .threat-name { font-weight: 600; color: var(--text); font-size: 12px; }
+    .threat-meta { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .threat-sev {
+      font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+      padding: 2px 6px; border-radius: 3px; white-space: nowrap; margin-top: 2px;
+    }
+    .sev-critical { background: rgba(255,45,85,0.2); color: var(--red); }
+    .sev-high { background: rgba(255,214,0,0.2); color: var(--yellow); }
+    .sev-medium { background: rgba(0,212,255,0.2); color: var(--cyan); }
+    .sev-low { background: rgba(0,255,157,0.2); color: var(--green); }
+
+    /* Threat action buttons */
+    .threat-actions {
+      display: flex; gap: 4px; margin-top: 4px;
+    }
+    .threat-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; padding: 2px 8px;
+      border-radius: 3px; cursor: pointer;
+      border: 1px solid; transition: all 0.2s;
+      background: transparent;
+    }
+    .threat-btn.kill-btn { color: var(--red); border-color: rgba(255,45,85,0.4); }
+    .threat-btn.kill-btn:hover { background: rgba(255,45,85,0.2); }
+    .threat-btn.block-btn { color: var(--yellow); border-color: rgba(255,214,0,0.4); }
+    .threat-btn.block-btn:hover { background: rgba(255,214,0,0.2); }
+    .threat-btn.quar-btn { color: var(--cyan); border-color: rgba(0,212,255,0.4); }
+    .threat-btn.quar-btn:hover { background: rgba(0,212,255,0.2); }
+
+    /* CENTER PANEL */
+    #panel-center { grid-row: 1; grid-column: 2; display: flex; flex-direction: column; }
+    .map-section { position: relative; flex: 1; min-height: 250px; cursor: default; }
+    #mapCanvas { width: 100%; height: 100%; display: block; }
+
+    /* Map tooltip / context popup */
+    .map-tooltip {
+      display: none;
+      position: absolute;
+      z-index: 100;
+      background: rgba(6,26,42,0.95);
+      border: 1px solid var(--cyan);
+      border-radius: 6px;
+      padding: 10px 14px;
+      min-width: 220px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6), var(--glow-cyan);
+      pointer-events: auto;
+    }
+    .map-tooltip.visible { display: block; animation: tooltip-pop 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes tooltip-pop {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .map-tooltip-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .map-tooltip-row {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; color: var(--text-dim);
+      padding: 2px 0;
+    }
+    .map-tooltip-row span { color: var(--text); }
+    .map-tooltip-actions {
+      display: flex; gap: 6px;
+      margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .map-tooltip .threat-btn { font-size: 10px; padding: 4px 10px; }
+    .event-section {
+      height: 220px; border-top: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    #eventstream {
+      flex: 1; overflow-y: auto; padding: 8px;
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .event-line {
+      display: flex; gap: 8px; padding: 3px 6px; margin-bottom: 2px;
+      border-radius: 3px; animation: event-fade-in 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+      transition: background 0.2s;
+    }
+    .event-line:hover { background: rgba(0,212,255,0.04); }
+    @keyframes event-fade-in {
+      0% { opacity: 0; transform: translateX(-20px) scaleX(0.95); }
+      60% { opacity: 1; }
+      100% { opacity: 1; transform: translateX(0) scaleX(1); }
+    }
+    .event-tag {
+      position: relative; overflow: hidden;
+    }
+    .event-tag::after {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: tag-shine 3s ease-in-out infinite;
+    }
+    @keyframes tag-shine {
+      0%, 80%, 100% { left: -100%; }
+      40% { left: 100%; }
+    }
+    .event-time { color: var(--text-dim); white-space: nowrap; min-width: 65px; }
+    .event-tag {
+      padding: 1px 6px; border-radius: 3px; font-size: 10px;
+      font-weight: 700; white-space: nowrap; min-width: 60px; text-align: center;
+    }
+    .tag-block { background: rgba(255,45,85,0.2); color: var(--red); border: 1px solid rgba(255,45,85,0.3); }
+    .tag-detect { background: rgba(255,214,0,0.2); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+    .tag-monitor { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
+    .tag-ok { background: rgba(0,255,157,0.2); color: var(--green); border: 1px solid rgba(0,255,157,0.3); }
+    .event-msg { color: var(--text); flex: 1; }
+
+    /* RIGHT PANEL: ACTIONS */
+    #panel-actions { grid-row: 1; grid-column: 3; display: flex; flex-direction: column; }
+    .action-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .action-item {
+      display: flex; gap: 10px; padding: 10px;
+      margin-bottom: 4px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s;
+      animation: action-pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes action-pop-in {
+      from { opacity: 0; transform: scale(0.9) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .action-item:hover { background: rgba(0,212,255,0.06); transform: scale(1.01); }
+    .action-icon { transition: transform 0.3s; }
+    .action-item:hover .action-icon { transform: scale(1.2); }
+    .action-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+    .action-info { flex: 1; }
+    .action-title { font-weight: 600; font-size: 12px; color: var(--text); }
+    .action-detail { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+    .action-time {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: var(--text-dim); white-space: nowrap; align-self: flex-start;
+    }
+
+    /* Manual IP block input */
+    .manual-input-row {
+      display: flex; gap: 6px; padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .manual-input {
+      flex: 1;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .manual-input:focus { border-color: var(--cyan); }
+    .manual-input::placeholder { color: var(--text-dim); }
+    .manual-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 1px;
+      padding: 6px 12px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 4px;
+      color: var(--cyan);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .manual-btn:hover { background: rgba(0,212,255,0.2); }
+    .manual-btn.danger {
+      background: rgba(255,45,85,0.1);
+      border-color: rgba(255,45,85,0.3);
+      color: var(--red);
+    }
+    .manual-btn.danger:hover { background: rgba(255,45,85,0.2); }
+
+    /* Blocked IPs section */
+    .blocked-ip-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 10px; margin-bottom: 2px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .blocked-ip-item .ip-addr { color: var(--yellow); }
+    .unblock-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; padding: 2px 8px;
+      background: rgba(0,255,157,0.1);
+      border: 1px solid rgba(0,255,157,0.3);
+      border-radius: 3px;
+      color: var(--green);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .unblock-btn:hover { background: rgba(0,255,157,0.2); }
+
+    /* Process table */
+    .proc-table-wrap {
+      flex: 1; overflow-y: auto; padding: 8px;
+    }
+    .proc-table {
+      width: 100%; border-collapse: collapse;
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .proc-table th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 2px;
+      text-align: left; padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      position: sticky; top: 0;
+      background: var(--bg-panel);
+      cursor: pointer;
+    }
+    .proc-table th:hover { color: var(--text); }
+    .proc-table td {
+      padding: 4px 8px;
+      border-bottom: 1px solid rgba(13,58,92,0.3);
+      color: var(--text);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .proc-table tr:hover td { background: rgba(0,212,255,0.03); }
+    .proc-table tr.suspicious td { color: var(--red); }
+    .proc-table tr.suspicious td:first-child { border-left: 2px solid var(--red); }
+    .proc-kill-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; padding: 2px 8px;
+      background: rgba(255,45,85,0.1);
+      border: 1px solid rgba(255,45,85,0.3);
+      border-radius: 3px;
+      color: var(--red);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .proc-kill-btn:hover { background: rgba(255,45,85,0.3); }
+
+    /* Connection table */
+    .conn-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+    .conn-table th {
+      font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 2px; text-align: left; padding: 6px 8px;
+      border-bottom: 1px solid var(--border); text-transform: uppercase;
+      position: sticky; top: 0; background: var(--bg-panel);
+    }
+    .conn-table td {
+      padding: 4px 8px; border-bottom: 1px solid rgba(13,58,92,0.3);
+      color: var(--text); max-width: 180px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .conn-table tr:hover td { background: rgba(0,212,255,0.03); }
+    .conn-block-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; padding: 2px 8px;
+      background: rgba(255,214,0,0.1);
+      border: 1px solid rgba(255,214,0,0.3);
+      border-radius: 3px; color: var(--yellow);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .conn-block-btn:hover { background: rgba(255,214,0,0.3); }
+
+    /* Quarantine list */
+    .quar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; margin-bottom: 2px; border-radius: 4px;
+      background: rgba(0,0,0,0.2);
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    }
+    .quar-filename { color: var(--cyan); font-weight: 600; }
+    .quar-detail { color: var(--text-dim); font-size: 10px; }
+
+    /* Expandable panels for tabbed views */
+    .full-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 0 8px 8px 8px;
+      overflow: hidden;
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .full-panel::after {
+      content: '';
+      position: absolute; top:0; left:0; right:0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.5;
+    }
+
+    /* BOTTOM ROW */
+    #bottom-row {
+      grid-column: 1 / -1; grid-row: 2;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 12px; height: 110px;
+    }
+    .mini-panel {
+      background: linear-gradient(180deg, rgba(6,26,42,0.9) 0%, rgba(4,18,30,0.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between;
+      animation: panel-slide-up 0.6s ease-out both;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .mini-panel:nth-child(1) { animation-delay: 0.5s; }
+    .mini-panel:nth-child(2) { animation-delay: 0.6s; }
+    .mini-panel:nth-child(3) { animation-delay: 0.7s; }
+    .mini-panel:nth-child(4) { animation-delay: 0.8s; }
+    .mini-panel:nth-child(5) { animation-delay: 0.9s; }
+    .mini-panel:hover {
+      border-color: rgba(0,212,255,0.3);
+      box-shadow: 0 0 20px rgba(0,212,255,0.08), inset 0 0 20px rgba(0,212,255,0.03);
+    }
+    .mini-panel::after {
+      content: ''; position: absolute; top:0; left:0; right:0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.4;
+    }
+    .mini-panel::before {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, transparent, rgba(0,212,255,0.02));
+      pointer-events: none;
+    }
+    .mini-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; color: var(--text-dim);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .mini-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px; font-weight: 700; color: var(--cyan);
+      text-shadow: 0 0 10px rgba(0,212,255,0.3);
+      transition: text-shadow 0.3s;
+    }
+    .mini-panel:hover .mini-value {
+      text-shadow: 0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2);
+    }
+    .mini-spark { height: 30px; width: 100%; }
+    .mini-spark svg { width: 100%; height: 100%; }
+
+    /* Placeholder */
+    .empty-placeholder {
+      padding: 20px; text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; color: var(--text-dim);
+      letter-spacing: 2px;
+    }
+
+    /* Toast notifications */
+    .toast-container {
+      position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px; padding: 10px 16px;
+      border-radius: 6px; min-width: 280px;
+      animation: toast-in 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .toast.success { background: rgba(0,255,157,0.15); border: 1px solid rgba(0,255,157,0.4); color: var(--green); }
+    .toast.error { background: rgba(255,45,85,0.15); border: 1px solid rgba(255,45,85,0.4); color: var(--red); }
+    .toast.info { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.4); color: var(--cyan); }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Search / filter bar */
+    .filter-bar {
+      display: flex; gap: 6px; padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-input {
+      flex: 1;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; padding: 4px 8px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text); outline: none;
+    }
+    .filter-input:focus { border-color: var(--cyan); }
+    .filter-input::placeholder { color: var(--text-dim); }
+
+    /* Resizable column dividers */
+    .resizer {
+      width: 6px;
+      cursor: col-resize;
+      background: transparent;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      position: relative;
+      z-index: 5;
+      flex-shrink: 0;
+      transition: background 0.2s;
+      align-self: stretch;
+    }
+    .resizer:hover, .resizer.dragging {
+      background: rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.4);
+    }
+    .resizer::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 24px;
+      background: var(--cyan);
+      opacity: 0.3;
+      border-radius: 1px;
+    }
+
+    /* Map filter buttons */
+    .map-filter-btns {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 10;
+      display: flex;
+      gap: 3px;
+    }
+    .map-filter-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px; letter-spacing: 1px;
+      padding: 3px 7px;
+      border-radius: 3px; cursor: pointer;
+      border: 1px solid rgba(0,212,255,0.3);
+      background: rgba(6,26,42,0.85);
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .map-filter-btn:hover { color: var(--cyan); border-color: rgba(0,212,255,0.6); }
+    .map-filter-btn.active {
+      background: rgba(0,212,255,0.15);
+      color: var(--cyan);
+      border-color: rgba(0,212,255,0.6);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      #main { grid-template-columns: 1fr; grid-template-rows: auto; }
+      #panel-score, #panel-actions { max-height: 400px; }
+      #bottom-row { grid-template-columns: repeat(3, 1fr); height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-bg"></canvas>
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="logo-group">
+      <div>
+        <div class="logo-main">SOCEAL</div>
+        <div class="logo-sub">Project VALE</div>
+      </div>
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot"></div>
+        <span id="status-text">SAFE MODE</span>
+      </div>
+      <div class="mode-toggle">
+        <span class="toggle-label active-label" id="lbl-safe">SAFE</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="mode-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label" id="lbl-active">ACTIVE</span>
+      </div>
+    </div>
+    <div class="top-stats">
+      <div class="top-stat">
+        <div class="top-stat-label">Blocked Today</div>
+        <div class="top-stat-val" id="stat-blocked">0</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Active Monitors</div>
+        <div class="top-stat-val" id="stat-monitors">3</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Threats (1h)</div>
+        <div class="top-stat-val" id="stat-threats">0</div>
+      </div>
+      <div class="top-stat">
+        <div class="top-stat-label">Uptime</div>
+        <div class="top-stat-val" id="stat-uptime">00:00:00</div>
+      </div>
+    </div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+
+  <!-- TAB BAR for additional views -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="dashboard">DASHBOARD</button>
+    <button class="tab-btn" data-tab="processes">PROCESSES</button>
+    <button class="tab-btn" data-tab="connections">CONNECTIONS</button>
+    <button class="tab-btn" data-tab="quarantine">QUARANTINE</button>
+    <button class="tab-btn" data-tab="blocked-ips">BLOCKED IPs</button>
+  </div>
+
+  <!-- TAB: DASHBOARD (main 3-column view) -->
+  <div class="tab-content active" id="tab-dashboard" style="height:calc(100vh - 105px)">
+    <div id="main">
+      <!-- LEFT: SCORE + THREATS -->
+      <div id="panel-score" class="panel">
+        <div class="panel-title">Security Overview</div>
+        <div class="score-section">
+          <div class="score-ring-container">
+            <svg viewBox="0 0 130 130">
+              <circle class="score-ring-bg" cx="65" cy="65" r="54"/>
+              <circle class="score-ring-fg" id="score-ring" cx="65" cy="65" r="54"
+                stroke="var(--green)" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+            </svg>
+            <div class="score-value" id="score-value">0</div>
+          </div>
+          <div class="score-label">SECURITY SCORE</div>
+        </div>
+        <div class="severity-grid">
+          <div class="severity-item">
+            <div class="severity-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div>
+            CRITICAL <span class="severity-count" id="sev-critical" style="color:var(--red)">0</span>
+          </div>
+          <div class="severity-item">
+            <div class="severity-dot" style="background:var(--yellow);box-shadow:0 0 6px var(--yellow)"></div>
+            HIGH <span class="severity-count" id="sev-high" style="color:var(--yellow)">0</span>
+          </div>
+          <div class="severity-item">
+            <div class="severity-dot" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></div>
+            MEDIUM <span class="severity-count" id="sev-medium" style="color:var(--cyan)">0</span>
+          </div>
+          <div class="severity-item">
+            <div class="severity-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+            LOW <span class="severity-count" id="sev-low" style="color:var(--green)">0</span>
+          </div>
+        </div>
+        <div class="panel-title" style="padding-top:8px">Active Threats</div>
+        <div class="threat-list" id="threat-list">
+          <div class="empty-placeholder">MONITORING...</div>
+        </div>
+      </div>
+
+      <!-- CENTER: MAP + EVENTS -->
+      <div id="panel-center" class="panel">
+        <div class="panel-title">Network Threat Map</div>
+        <div class="map-section">
+          <canvas id="mapCanvas"></canvas>
+          <div class="map-tooltip" id="map-tooltip">
+            <div class="map-tooltip-title" id="tooltip-title"></div>
+            <div id="tooltip-body"></div>
+            <div class="map-tooltip-actions" id="tooltip-actions"></div>
+          </div>
+        </div>
+        <div class="event-section">
+          <div class="panel-title">Event Stream</div>
+          <div id="eventstream">
+            <div class="empty-placeholder">WAITING FOR EVENTS...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: COUNTERMEASURES -->
+      <div id="panel-actions" class="panel">
+        <div class="panel-title">Countermeasures</div>
+        <div class="manual-input-row">
+          <input type="text" class="manual-input" id="manual-ip-input" placeholder="Enter IP to block..."/>
+          <button class="manual-btn" onclick="manualBlockIP()">BLOCK</button>
+        </div>
+        <div class="action-list" id="action-list">
+          <div class="empty-placeholder">NO ACTIONS YET</div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div id="bottom-row">
+        <div class="mini-panel">
+          <div class="mini-label">Events / Min</div>
+          <div class="mini-value" id="mini-epm">0</div>
+          <div class="mini-spark" id="spark-epm"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-label">Processes Watched</div>
+          <div class="mini-value" id="mini-proc">0</div>
+          <div class="mini-spark" id="spark-proc"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-label">IPs Blocked</div>
+          <div class="mini-value" id="mini-ips">0</div>
+          <div class="mini-spark" id="spark-ips"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-label">Files in Quarantine</div>
+          <div class="mini-value" id="mini-quarantine">0</div>
+          <div class="mini-spark" id="spark-quarantine"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-label">Net Connections</div>
+          <div class="mini-value" id="mini-net">0</div>
+          <div class="mini-spark" id="spark-net"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PROCESSES -->
+  <div class="tab-content" id="tab-processes" style="height:calc(100vh - 105px);padding:12px;">
+    <div class="full-panel">
+      <div class="panel-title">
+        Process Monitor
+        <span style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim)" id="proc-count-label">0 processes</span>
+      </div>
+      <div class="filter-bar">
+        <input type="text" class="filter-input" id="proc-filter" placeholder="Filter by name, PID, or path..."/>
+        <button class="manual-btn" onclick="refreshProcesses()">REFRESH</button>
+      </div>
+      <div class="proc-table-wrap" id="proc-table-wrap">
+        <table class="proc-table">
+          <thead>
+            <tr>
+              <th onclick="sortProcs('pid')">PID</th>
+              <th onclick="sortProcs('name')">Name</th>
+              <th onclick="sortProcs('cpu_percent')">CPU%</th>
+              <th onclick="sortProcs('memory_mb')">MEM (MB)</th>
+              <th>Path</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="proc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: CONNECTIONS -->
+  <div class="tab-content" id="tab-connections" style="height:calc(100vh - 105px);padding:12px;">
+    <div class="full-panel">
+      <div class="panel-title">
+        Network Connections
+        <span style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim)" id="conn-count-label">0 connections</span>
+      </div>
+      <div class="filter-bar">
+        <input type="text" class="filter-input" id="conn-filter" placeholder="Filter by IP, port, or process..."/>
+        <button class="manual-btn" onclick="refreshConnections()">REFRESH</button>
+      </div>
+      <div class="proc-table-wrap" id="conn-table-wrap">
+        <table class="conn-table">
+          <thead>
+            <tr>
+              <th>Local</th>
+              <th>Remote</th>
+              <th>Status</th>
+              <th>PID</th>
+              <th>Process</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="conn-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: QUARANTINE -->
+  <div class="tab-content" id="tab-quarantine" style="height:calc(100vh - 105px);padding:12px;">
+    <div class="full-panel">
+      <div class="panel-title">
+        Quarantined Files
+        <span style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim)" id="quar-count-label">0 files</span>
+      </div>
+      <div class="proc-table-wrap" id="quar-list">
+        <div class="empty-placeholder">NO QUARANTINED FILES</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: BLOCKED IPs -->
+  <div class="tab-content" id="tab-blocked-ips" style="height:calc(100vh - 105px);padding:12px;">
+    <div class="full-panel">
+      <div class="panel-title">
+        Blocked IP Addresses
+        <span style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim)" id="blocked-count-label">0 blocked</span>
+      </div>
+      <div class="manual-input-row">
+        <input type="text" class="manual-input" id="blocked-ip-input" placeholder="Enter IP to block..."/>
+        <button class="manual-btn" onclick="manualBlockIPFromTab()">BLOCK IP</button>
+      </div>
+      <div class="proc-table-wrap" id="blocked-list">
+        <div class="empty-placeholder">NO BLOCKED IPs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+  /* ============================================================
+     SOCeal – Project VALE Dashboard
+     Fully interactive manual SOC — real data only
+     ============================================================ */
+  (function() {
+    'use strict';
+
+    const API_BASE = window.location.origin;
+
+    // ── State ──
+    let lastEventTimestamp = '';
+    let firstEventLoad = true;
+    let processData = [];
+    let connectionData = [];
+    let procSortKey = 'memory_mb';
+    let procSortAsc = false;
+    const sparkHistory = {
+      epm: [], proc: [], ips: [], quarantine: [], net: []
+    };
+    const MAX_SPARK = 20;
+
+    // ── Utility ──
+    function nowTime() {
+      return new Date().toTimeString().slice(0, 8);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Toast notifications ──
+    function showToast(message, type) {
+      type = type || 'info';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        toast.style.transition = 'all 0.3s';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 3000);
+    }
+
+    // ── API helpers ──
+    function apiPost(endpoint, body) {
+      return fetch(API_BASE + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(function(r) { return r.json(); });
+    }
+
+    function apiGet(endpoint) {
+      return fetch(API_BASE + endpoint).then(function(r) { return r.ok ? r.json() : null; });
+    }
+
+    // ── Tab switching ──
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        btn.classList.add('active');
+        var tabId = 'tab-' + btn.dataset.tab;
+        document.getElementById(tabId).classList.add('active');
+
+        // Refresh data for tab
+        if (btn.dataset.tab === 'processes') refreshProcesses();
+        if (btn.dataset.tab === 'connections') refreshConnections();
+        if (btn.dataset.tab === 'quarantine') refreshQuarantine();
+        if (btn.dataset.tab === 'blocked-ips') refreshBlockedIPs();
+      });
+    });
+
+    // ── Background Particles ──
+    (function() {
+      var pCanvas = document.getElementById('particles-bg');
+      var pCtx = pCanvas.getContext('2d');
+      var particles = [];
+      var PARTICLE_COUNT = 60;
+
+      function resizeParticles() {
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeParticles);
+      resizeParticles();
+
+      for (var i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * pCanvas.width,
+          y: Math.random() * pCanvas.height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          r: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.3 + 0.1,
+          color: ['#00d4ff', '#00ff9d', '#0d3a5c'][Math.floor(Math.random() * 3)]
+        });
+      }
+
+      function drawParticles() {
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        var w = pCanvas.width, h = pCanvas.height;
+
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+
+          pCtx.beginPath();
+          pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          pCtx.fillStyle = p.color;
+          pCtx.globalAlpha = p.alpha;
+          pCtx.fill();
+
+          // Draw faint connections between nearby particles
+          for (var j = i + 1; j < particles.length; j++) {
+            var q = particles[j];
+            var dx = p.x - q.x, dy = p.y - q.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              pCtx.beginPath();
+              pCtx.moveTo(p.x, p.y);
+              pCtx.lineTo(q.x, q.y);
+              pCtx.strokeStyle = '#00d4ff';
+              pCtx.globalAlpha = (1 - dist / 120) * 0.06;
+              pCtx.lineWidth = 0.5;
+              pCtx.stroke();
+            }
+          }
+        }
+        pCtx.globalAlpha = 1;
+        requestAnimationFrame(drawParticles);
+      }
+      requestAnimationFrame(drawParticles);
+    })();
+
+    // ── Clock ──
+    function updateClock() {
+      document.getElementById('clock').textContent = nowTime();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── Uptime (from backend) ──
+    function formatUptime(sec) {
+      var h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      var m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      var s = String(sec % 60).padStart(2, '0');
+      return h + ':' + m + ':' + s;
+    }
+
+    // ── Security Score ──
+    function setScore(score) {
+      var circumference = 2 * Math.PI * 54;
+      var offset = circumference * (1 - score / 100);
+      var ring = document.getElementById('score-ring');
+      ring.style.strokeDashoffset = offset;
+      if (score >= 75) ring.setAttribute('stroke', 'var(--green)');
+      else if (score >= 50) ring.setAttribute('stroke', 'var(--yellow)');
+      else ring.setAttribute('stroke', 'var(--red)');
+      document.getElementById('score-value').textContent = score;
+      document.getElementById('score-value').style.color =
+        score >= 75 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+    }
+
+    // ── Mode toggle ──
+    var modeToggle = document.getElementById('mode-toggle');
+    var statusBadge = document.getElementById('status-badge');
+    var statusText = document.getElementById('status-text');
+    var lblSafe = document.getElementById('lbl-safe');
+    var lblActive = document.getElementById('lbl-active');
+
+    function updateModeUI(safeMode) {
+      modeToggle.checked = !safeMode;
+      if (safeMode) {
+        statusBadge.classList.remove('active-mode');
+        statusText.textContent = 'SAFE MODE';
+        lblSafe.classList.add('active-label');
+        lblActive.classList.remove('active-label');
+      } else {
+        statusBadge.classList.add('active-mode');
+        statusText.textContent = 'ACTIVE MODE';
+        lblSafe.classList.remove('active-label');
+        lblActive.classList.add('active-label');
+      }
+    }
+
+    modeToggle.addEventListener('change', function() {
+      var safeMode = !modeToggle.checked;
+      apiPost('/api/mode', { safe_mode: safeMode }).then(function(data) {
+        updateModeUI(data.safe_mode);
+        showToast(data.safe_mode ? 'Switched to SAFE MODE' : 'Switched to ACTIVE MODE',
+                  data.safe_mode ? 'success' : 'error');
+      }).catch(function() {
+        showToast('Failed to change mode', 'error');
+      });
+    });
+
+    // Init mode
+    apiGet('/api/mode').then(function(data) {
+      if (data) updateModeUI(data.safe_mode);
+    });
+
+    // ── Threats ──
+    function renderThreats(threats) {
+      var el = document.getElementById('threat-list');
+      if (!threats || threats.length === 0) {
+        el.innerHTML = '<div class="empty-placeholder">NO ACTIVE THREATS</div>';
+        document.getElementById('sev-critical').textContent = '0';
+        document.getElementById('sev-high').textContent = '0';
+        document.getElementById('sev-medium').textContent = '0';
+        document.getElementById('sev-low').textContent = '0';
+        return;
+      }
+      el.innerHTML = '';
+      var counts = { critical: 0, high: 0, medium: 0, low: 0 };
+      var colors = { critical: 'var(--red)', high: 'var(--yellow)', medium: 'var(--cyan)', low: 'var(--green)' };
+
+      threats.forEach(function(t) {
+        counts[t.severity] = (counts[t.severity] || 0) + 1;
+
+        var buttons = '<div class="threat-actions">';
+        if (t.pid) buttons += '<button class="threat-btn kill-btn" onclick="killProcess(' + t.pid + ',\'' + escapeHtml(t.name || '') + '\')">KILL</button>';
+        if (t.ip) buttons += '<button class="threat-btn block-btn" onclick="blockIP(\'' + escapeHtml(t.ip) + '\')">BLOCK IP</button>';
+        if (t.path) buttons += '<button class="threat-btn quar-btn" onclick="quarantineFile(\'' + escapeHtml(t.path).replace(/\\/g, '\\\\') + '\')">QUARANTINE</button>';
+        buttons += '</div>';
+
+        el.innerHTML +=
+          '<div class="threat-item ' + t.severity + '">' +
+            '<div class="threat-dot" style="background:' + (colors[t.severity] || colors.medium) + ';box-shadow:0 0 6px ' + (colors[t.severity] || colors.medium) + '"></div>' +
+            '<div class="threat-info">' +
+              '<div class="threat-name">' + escapeHtml(t.name) + '</div>' +
+              '<div class="threat-meta">' + escapeHtml(t.meta) + '</div>' +
+              buttons +
+            '</div>' +
+            '<div class="threat-sev sev-' + t.severity + '">' + t.severity.toUpperCase() + '</div>' +
+          '</div>';
+      });
+      document.getElementById('sev-critical').textContent = counts.critical || 0;
+      document.getElementById('sev-high').textContent = counts.high || 0;
+      document.getElementById('sev-medium').textContent = counts.medium || 0;
+      document.getElementById('sev-low').textContent = counts.low || 0;
+    }
+
+    // ── Actions ──
+    function renderActions(actions) {
+      var el = document.getElementById('action-list');
+      if (!actions || actions.length === 0) {
+        el.innerHTML = '<div class="empty-placeholder">NO ACTIONS YET</div>';
+        return;
+      }
+      el.innerHTML = '';
+      actions.forEach(function(a) {
+        var undoBtn = '';
+        if (a.action_type === 'block_ip' && a.detail) {
+          undoBtn = ' <button class="unblock-btn" onclick="unblockIP(\'' + escapeHtml(a.detail) + '\')">UNBLOCK</button>';
+        }
+        el.innerHTML +=
+          '<div class="action-item">' +
+            '<div class="action-icon">' + (a.icon || '📋') + '</div>' +
+            '<div class="action-info">' +
+              '<div class="action-title">' + escapeHtml(a.title || a.action_type) + undoBtn + '</div>' +
+              '<div class="action-detail">' + escapeHtml(a.detail || '') + '</div>' +
+            '</div>' +
+            '<div class="action-time">' + escapeHtml(a.time || '') + '</div>' +
+          '</div>';
+      });
+    }
+
+    // ── Event Stream ──
+    function mapSeverityToTag(severity) {
+      var map = {
+        critical: 'BLOCK', high: 'DETECT', medium: 'MONITOR', low: 'OK',
+        audit_failure: 'DETECT', audit_success: 'OK',
+        error: 'BLOCK', warning: 'DETECT', info: 'MONITOR'
+      };
+      return map[(severity || '').toLowerCase()] || 'MONITOR';
+    }
+
+    function addEventLine(time, tag, msg) {
+      var eventStream = document.getElementById('eventstream');
+      // Remove placeholder
+      var placeholder = eventStream.querySelector('.empty-placeholder');
+      if (placeholder) placeholder.remove();
+
+      var tagClass = { BLOCK: 'tag-block', DETECT: 'tag-detect', MONITOR: 'tag-monitor', OK: 'tag-ok' };
+      var div = document.createElement('div');
+      div.className = 'event-line';
+      div.innerHTML =
+        '<span class="event-time">' + escapeHtml(time) + '</span>' +
+        '<span class="event-tag ' + (tagClass[tag] || 'tag-monitor') + '">' + escapeHtml(tag) + '</span>' +
+        '<span class="event-msg">' + escapeHtml(msg) + '</span>';
+      eventStream.prepend(div);
+      while (eventStream.children.length > 100) eventStream.removeChild(eventStream.lastChild);
+    }
+
+    // ── Sparklines ──
+    function createSparkline(containerId, data, color) {
+      var container = document.getElementById(containerId);
+      if (!container || data.length < 2) {
+        if (container) container.innerHTML = '';
+        return;
+      }
+      var w = 160, h = 30;
+      var max = Math.max.apply(null, data) * 1.1 || 1;
+      var min = Math.min.apply(null, data) * 0.9;
+      var range = max - min || 1;
+      var points = data.map(function(v, i) {
+        var x = (i / (data.length - 1)) * w;
+        var y = h - ((v - min) / range) * h;
+        return x + ',' + y;
+      }).join(' ');
+      var fillPoints = '0,' + h + ' ' + points + ' ' + w + ',' + h;
+      var gradId = 'grad-' + containerId;
+      container.innerHTML =
+        '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+          '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.3"/>' +
+            '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/>' +
+          '</linearGradient></defs>' +
+          '<polygon points="' + fillPoints + '" fill="url(#' + gradId + ')"/>' +
+          '<polyline points="' + points + '" fill="none" stroke="' + color + '" stroke-width="1.5" ' +
+            'stroke-linejoin="round" filter="drop-shadow(0 0 3px ' + color + ')"/>' +
+        '</svg>';
+    }
+
+    function pushSparkValue(key, val) {
+      sparkHistory[key].push(val);
+      if (sparkHistory[key].length > MAX_SPARK) sparkHistory[key].shift();
+    }
+
+    function applyStats(stats) {
+      if (stats.events_per_minute !== undefined) {
+        document.getElementById('mini-epm').textContent = stats.events_per_minute;
+        pushSparkValue('epm', stats.events_per_minute);
+      }
+      if (stats.processes_watched !== undefined) {
+        document.getElementById('mini-proc').textContent = stats.processes_watched;
+        pushSparkValue('proc', stats.processes_watched);
+      }
+      if (stats.ips_blocked !== undefined) {
+        document.getElementById('mini-ips').textContent = stats.ips_blocked;
+        document.getElementById('stat-blocked').textContent = stats.ips_blocked;
+        pushSparkValue('ips', stats.ips_blocked);
+      }
+      if (stats.files_quarantined !== undefined) {
+        document.getElementById('mini-quarantine').textContent = stats.files_quarantined;
+        pushSparkValue('quarantine', stats.files_quarantined);
+      }
+      if (stats.net_connections !== undefined) {
+        document.getElementById('mini-net').textContent = stats.net_connections;
+        pushSparkValue('net', stats.net_connections);
+      }
+      if (stats.threats_1h !== undefined) {
+        document.getElementById('stat-threats').textContent = stats.threats_1h;
+      }
+      if (stats.uptime !== undefined) {
+        document.getElementById('stat-uptime').textContent = formatUptime(stats.uptime);
+      }
+      if (stats.security_score !== undefined) {
+        setScore(stats.security_score);
+      }
+
+      // Update sparklines
+      createSparkline('spark-epm', sparkHistory.epm, '#00d4ff');
+      createSparkline('spark-proc', sparkHistory.proc, '#00ff9d');
+      createSparkline('spark-ips', sparkHistory.ips, '#ffd600');
+      createSparkline('spark-quarantine', sparkHistory.quarantine, '#ff2d55');
+      createSparkline('spark-net', sparkHistory.net, '#00d4ff');
+    }
+
+    // ── Network Map: Live Connections + Threats (Interactive) ──
+    var mapCanvas = document.getElementById('mapCanvas');
+    var ctx = mapCanvas.getContext('2d');
+    var mapNodes = [];        // All nodes on the map
+    var pingCircles = [];
+    var dataPackets = [];     // Animated packets traveling along lines
+    var hoveredNode = null;
+    var selectedNode = null;
+    var threatIPs = {};
+    var blockedIPs = {};
+    var radarAngle = 0;       // Radar sweep angle
+
+    // Tooltip elements
+    var tooltip = document.getElementById('map-tooltip');
+    var tooltipTitle = document.getElementById('tooltip-title');
+    var tooltipBody = document.getElementById('tooltip-body');
+    var tooltipActions = document.getElementById('tooltip-actions');
+
+    function resizeCanvas() {
+      var rect = mapCanvas.parentElement.getBoundingClientRect();
+      mapCanvas.width = rect.width;
+      mapCanvas.height = rect.height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function spawnPing(x, y, color) {
+      pingCircles.push({ x: x, y: y, radius: 4, alpha: 0.7, color: color });
+    }
+
+    // Spawn a data packet that travels from node → center (or vice versa)
+    function spawnPacket(fromX, fromY, toX, toY, color, reverse) {
+      if (reverse) { var tmp; tmp = fromX; fromX = toX; toX = tmp; tmp = fromY; fromY = toY; toY = tmp; }
+      dataPackets.push({ fromX: fromX, fromY: fromY, toX: toX, toY: toY, t: 0, speed: 0.008 + Math.random() * 0.008, color: color, size: 2 + Math.random() * 1.5 });
+    }
+
+    // Classify a remote IP
+    function classifyIP(ip) {
+      if (blockedIPs[ip]) return { color: '#ff2d55', cat: 'BLOCKED', ring: 2 };
+      if (threatIPs[ip]) {
+        var sev = threatIPs[ip];
+        if (sev === 'critical') return { color: '#ff2d55', cat: 'CRITICAL', ring: 1 };
+        if (sev === 'high')     return { color: '#ffd600', cat: 'HIGH', ring: 1 };
+        return { color: '#ffd600', cat: 'THREAT', ring: 1 };
+      }
+      if (ip.startsWith('127.') || ip === '0.0.0.0') return { color: '#00ff9d33', cat: 'LOCAL', ring: 3 };
+      if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.match(/^172\.(1[6-9]|2\d|3[01])\./))
+        return { color: '#00ff9d', cat: 'LAN', ring: 2 };
+      return { color: '#00d4ff', cat: 'EXTERNAL', ring: 2 };
+    }
+
+    // Build map nodes from connections + threats
+    function updateMapFromConnections(connections, threats, blocked) {
+      threatIPs = {};
+      if (threats) threats.forEach(function(t) {
+        if (t.ip) threatIPs[t.ip] = t.severity;
+      });
+      blockedIPs = {};
+      if (blocked) blocked.forEach(function(ip) { blockedIPs[ip] = true; });
+
+      var groups = {};
+      if (connections) connections.forEach(function(c) {
+        if (!c.remote_ip || c.remote_ip === '0.0.0.0' || c.remote_ip === '::' || c.remote_ip === '127.0.0.1') return;
+        if (!groups[c.remote_ip]) {
+          groups[c.remote_ip] = { ip: c.remote_ip, connections: [], processes: new Set(), ports: new Set() };
+        }
+        groups[c.remote_ip].connections.push(c);
+        if (c.process) groups[c.remote_ip].processes.add(c.process);
+        if (c.remote_port) groups[c.remote_ip].ports.add(c.remote_port);
+      });
+
+      if (threats) threats.forEach(function(t) {
+        if (t.ip && !groups[t.ip]) {
+          groups[t.ip] = { ip: t.ip, connections: [], processes: new Set(), ports: new Set(), threatOnly: true };
+        }
+      });
+
+      var ips = Object.keys(groups);
+      var newNodes = [];
+      var existingMap = {};
+      mapNodes.forEach(function(n) { existingMap[n.ip] = n; });
+
+      ips.forEach(function(ip, i) {
+        var g = groups[ip];
+        var info = classifyIP(ip);
+        var existing = existingMap[ip];
+
+        var angle = existing ? existing.angle : (i / Math.max(ips.length, 1)) * Math.PI * 2 - Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+        var dist = existing ? existing.dist : 0.35 + (info.ring / 3) * 0.25 + (Math.random() * 0.1);
+
+        newNodes.push({
+          ip: ip, label: ip,
+          detail: Array.from(g.processes).join(', ') || (g.threatOnly ? 'THREAT' : ''),
+          connCount: g.connections.length,
+          ports: Array.from(g.ports).slice(0, 5).join(', '),
+          angle: angle, dist: Math.min(dist, 0.9),
+          color: info.color, cat: info.cat,
+          isThreat: !!threatIPs[ip], isBlocked: !!blockedIPs[ip],
+          severity: threatIPs[ip] || '',
+          pulse: existing ? existing.pulse : Math.floor(Math.random() * 100),
+          packetTimer: existing ? existing.packetTimer : Math.floor(Math.random() * 60),
+          sx: 0, sy: 0, hitRadius: 18,
+          processes: Array.from(g.processes),
+          allPorts: Array.from(g.ports),
+        });
+      });
+      mapNodes = newNodes;
+    }
+
+    function nodeAtPoint(mx, my) {
+      for (var i = mapNodes.length - 1; i >= 0; i--) {
+        var n = mapNodes[i];
+        var dx = mx - n.sx, dy = my - n.sy;
+        if (dx * dx + dy * dy < n.hitRadius * n.hitRadius) return n;
+      }
+      return null;
+    }
+
+    function showNodeTooltip(node, screenX, screenY) {
+      selectedNode = node;
+      tooltipTitle.textContent = node.ip;
+      var bodyHtml =
+        '<div class="map-tooltip-row">Category: <span style="color:' + node.color + '">' + node.cat + '</span></div>' +
+        '<div class="map-tooltip-row">Connections: <span>' + node.connCount + '</span></div>';
+      if (node.ports) bodyHtml += '<div class="map-tooltip-row">Ports: <span>' + escapeHtml(node.ports) + '</span></div>';
+      if (node.detail) bodyHtml += '<div class="map-tooltip-row">Processes: <span>' + escapeHtml(node.detail) + '</span></div>';
+      if (node.severity) bodyHtml += '<div class="map-tooltip-row">Threat: <span style="color:var(--red)">' + node.severity.toUpperCase() + '</span></div>';
+      if (node.isBlocked) bodyHtml += '<div class="map-tooltip-row"><span style="color:var(--red)">BLOCKED</span></div>';
+      tooltipBody.innerHTML = bodyHtml;
+
+      var actionsHtml = '';
+      if (!node.isBlocked) {
+        actionsHtml += '<button class="threat-btn block-btn" onclick="blockIP(\'' + escapeHtml(node.ip) + '\'); hideMapTooltip();">BLOCK IP</button>';
+      } else {
+        actionsHtml += '<button class="threat-btn" style="color:var(--green);border-color:rgba(0,255,157,0.4)" onclick="unblockIP(\'' + escapeHtml(node.ip) + '\'); hideMapTooltip();">UNBLOCK</button>';
+      }
+      tooltipActions.innerHTML = actionsHtml;
+
+      var mapRect = mapCanvas.parentElement.getBoundingClientRect();
+      var tx = Math.min(screenX + 15, mapRect.width - 240);
+      var ty = Math.min(screenY - 10, mapRect.height - 150);
+      if (tx < 0) tx = 10; if (ty < 0) ty = 10;
+      tooltip.style.left = tx + 'px'; tooltip.style.top = ty + 'px';
+      tooltip.classList.add('visible');
+    }
+
+    window.hideMapTooltip = function() { tooltip.classList.remove('visible'); selectedNode = null; };
+
+    mapCanvas.addEventListener('mousemove', function(e) {
+      var rect = mapCanvas.getBoundingClientRect();
+      hoveredNode = nodeAtPoint(e.clientX - rect.left, e.clientY - rect.top);
+      mapCanvas.style.cursor = hoveredNode ? 'pointer' : 'default';
+    });
+    mapCanvas.addEventListener('click', function(e) {
+      var rect = mapCanvas.getBoundingClientRect();
+      var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      var node = nodeAtPoint(mx, my);
+      if (node) showNodeTooltip(node, mx, my); else hideMapTooltip();
+    });
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.map-section')) hideMapTooltip();
+    });
+
+    // ── Draw hexagonal grid ──
+    function drawHexGrid(ctx, w, h, size, color) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.3;
+      var hSpacing = size * 1.5;
+      var vSpacing = size * Math.sqrt(3);
+      for (var row = -1; row * vSpacing < h + vSpacing; row++) {
+        for (var col = -1; col * hSpacing < w + hSpacing; col++) {
+          var cx2 = col * hSpacing;
+          var cy2 = row * vSpacing + (col % 2 ? vSpacing / 2 : 0);
+          ctx.beginPath();
+          for (var s = 0; s < 6; s++) {
+            var a = Math.PI / 3 * s;
+            var px = cx2 + size * Math.cos(a);
+            var py = cy2 + size * Math.sin(a);
+            if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+          }
+          ctx.closePath(); ctx.stroke();
+        }
+      }
+    }
+
+    function drawMap(timestamp) {
+      var w = mapCanvas.width, h = mapCanvas.height;
+      if (w === 0 || h === 0) { requestAnimationFrame(drawMap); return; }
+      var cx = w / 2, cy = h / 2;
+      var maxDist = Math.min(w, h) * 0.42;
+      var time = timestamp || 0;
+      var dashOffset = (time / 40) % 100;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // ── Background: hexagonal grid ──
+      drawHexGrid(ctx, w, h, 30, 'rgba(0,212,255,0.025)');
+
+      // ── Concentric rings with animated dash ──
+      for (var r = 1; r <= 4; r++) {
+        var ringR = maxDist * r / 4;
+        ctx.beginPath(); ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,212,255,' + (0.04 + 0.01 * r) + ')';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 6]);
+        ctx.lineDashOffset = -dashOffset * 0.3 * r;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // ── Ring labels ──
+      var ringLabels = ['', 'THREATS', 'NETWORK', 'EXTERNAL', 'LOCAL'];
+      for (var r = 1; r <= 4; r++) {
+        if (ringLabels[r]) {
+          ctx.font = '7px "Orbitron"';
+          ctx.fillStyle = 'rgba(0,212,255,0.12)';
+          ctx.textAlign = 'center';
+          ctx.fillText(ringLabels[r], cx, cy - maxDist * r / 4 + 10);
+          ctx.textAlign = 'left';
+        }
+      }
+
+      // ── Radar sweep ──
+      radarAngle = ((time / 3000) % 1) * Math.PI * 2;
+      var sweepGrd = ctx.createConicalGradient ? null : null; // fallback
+      // Draw radar wedge
+      ctx.save();
+      ctx.globalAlpha = 0.08;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, maxDist * 1.1, radarAngle - 0.5, radarAngle, false);
+      ctx.closePath();
+      var radarGrd = ctx.createLinearGradient(
+        cx + Math.cos(radarAngle - 0.5) * maxDist, cy + Math.sin(radarAngle - 0.5) * maxDist,
+        cx + Math.cos(radarAngle) * maxDist, cy + Math.sin(radarAngle) * maxDist
+      );
+      radarGrd.addColorStop(0, 'rgba(0,212,255,0)');
+      radarGrd.addColorStop(1, 'rgba(0,212,255,1)');
+      ctx.fillStyle = radarGrd;
+      ctx.fill();
+      ctx.restore();
+
+      // Radar line
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(radarAngle) * maxDist * 1.1, cy + Math.sin(radarAngle) * maxDist * 1.1);
+      ctx.strokeStyle = 'rgba(0,212,255,0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // ── Cross-hairs ──
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke();
+      // Diagonal
+      ctx.beginPath(); ctx.moveTo(cx - maxDist, cy - maxDist); ctx.lineTo(cx + maxDist, cy + maxDist); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + maxDist, cy - maxDist); ctx.lineTo(cx - maxDist, cy + maxDist); ctx.stroke();
+      ctx.restore();
+
+      // ── Draw all nodes ──
+      mapNodes.forEach(function(node, i) {
+        var rad = node.angle;
+        var nx = cx + Math.cos(rad) * maxDist * node.dist;
+        var ny = cy + Math.sin(rad) * maxDist * node.dist;
+        node.sx = nx; node.sy = ny;
+
+        var isHovered = (hoveredNode === node);
+        var isSelected = (selectedNode === node);
+        var isThreatLike = node.isThreat || node.isBlocked;
+        var lineAlpha = isThreatLike ? '45' : '15';
+        var dotSize = isThreatLike ? 5 : 3;
+
+        // ── Connection line to center ──
+        ctx.beginPath(); ctx.moveTo(nx, ny); ctx.lineTo(cx, cy);
+        ctx.strokeStyle = node.color + lineAlpha;
+        ctx.lineWidth = (isThreatLike || isHovered) ? 2 : 0.8;
+        if (isThreatLike) {
+          ctx.setLineDash([6, 6]);
+          ctx.lineDashOffset = dashOffset + i * 12;
+        } else {
+          ctx.setLineDash([1, 5]);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // ── Outer glow ring (animated) ──
+        if (isThreatLike || isHovered || isSelected) {
+          var outerR = 14 + Math.sin(time / 600 + i * 0.7) * 3;
+          ctx.beginPath(); ctx.arc(nx, ny, outerR, 0, Math.PI * 2);
+          ctx.strokeStyle = node.color + '30';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // ── Glow ──
+        var baseGlow = isThreatLike ? 25 : 14;
+        var glowSize = baseGlow + Math.sin(time / 700 + i * 1.2) * 5;
+        if (isHovered || isSelected) glowSize += 10;
+        var grd = ctx.createRadialGradient(nx, ny, 1, nx, ny, glowSize);
+        grd.addColorStop(0, node.color + (isHovered ? 'a0' : '60'));
+        grd.addColorStop(0.5, node.color + '20');
+        grd.addColorStop(1, node.color + '00');
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(nx, ny, glowSize, 0, Math.PI * 2); ctx.fill();
+
+        // ── Dot (diamond shape for threats) ──
+        var ds = dotSize + (isHovered ? 2.5 : 0);
+        if (isThreatLike) {
+          // Diamond shape
+          ctx.beginPath();
+          ctx.moveTo(nx, ny - ds); ctx.lineTo(nx + ds, ny);
+          ctx.lineTo(nx, ny + ds); ctx.lineTo(nx - ds, ny);
+          ctx.closePath();
+          ctx.fillStyle = node.color; ctx.fill();
+          ctx.strokeStyle = node.color; ctx.lineWidth = 1; ctx.stroke();
+        } else {
+          ctx.beginPath(); ctx.arc(nx, ny, ds, 0, Math.PI * 2);
+          ctx.fillStyle = node.color; ctx.fill();
+        }
+
+        // ── Blocked X indicator ──
+        if (node.isBlocked) {
+          ctx.strokeStyle = '#ff2d55'; ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.moveTo(nx - 8, ny - 8); ctx.lineTo(nx + 8, ny + 8); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(nx + 8, ny - 8); ctx.lineTo(nx - 8, ny + 8); ctx.stroke();
+        }
+
+        // ── Labels ──
+        ctx.font = '9px "Share Tech Mono"';
+        ctx.fillStyle = (isHovered || isSelected) ? '#ffffff' : node.color;
+        ctx.textAlign = 'left';
+        ctx.fillText(node.label, nx + 12, ny - 5);
+        if (node.detail) {
+          ctx.fillStyle = 'rgba(200,220,232,0.35)';
+          ctx.fillText(node.detail.substring(0, 22), nx + 12, ny + 7);
+        }
+        if (node.connCount > 1) {
+          ctx.font = 'bold 8px "Orbitron"';
+          ctx.fillStyle = node.color + '90';
+          ctx.fillText('x' + node.connCount, nx + 12, ny + 17);
+        }
+
+        // ── Category tag ──
+        if (isHovered) {
+          ctx.font = '7px "Orbitron"';
+          ctx.fillStyle = node.color + 'cc';
+          ctx.fillText('[' + node.cat + ']', nx + 12, ny - 16);
+        }
+
+        // ── Ping + packet spawn ──
+        node.pulse += 1;
+        if (isThreatLike && node.pulse > 70 + i * 15) {
+          spawnPing(nx, ny, node.color);
+          node.pulse = 0;
+        }
+        // Spawn data packets periodically
+        node.packetTimer += 1;
+        var packetInterval = isThreatLike ? 50 : 120;
+        if (node.packetTimer > packetInterval + i * 8) {
+          spawnPacket(nx, ny, cx, cy, node.color, Math.random() > 0.3);
+          node.packetTimer = 0;
+        }
+      });
+
+      // ── Data packets (traveling dots along lines) ──
+      for (var di = dataPackets.length - 1; di >= 0; di--) {
+        var dp = dataPackets[di];
+        dp.t += dp.speed;
+        if (dp.t >= 1) { dataPackets.splice(di, 1); continue; }
+        var px = dp.fromX + (dp.toX - dp.fromX) * dp.t;
+        var py = dp.fromY + (dp.toY - dp.fromY) * dp.t;
+
+        // Trail
+        var trailLen = 3;
+        for (var ti = 0; ti < trailLen; ti++) {
+          var tt = Math.max(0, dp.t - ti * 0.015);
+          var tx = dp.fromX + (dp.toX - dp.fromX) * tt;
+          var ty = dp.fromY + (dp.toY - dp.fromY) * tt;
+          var ta = (1 - ti / trailLen) * 0.5;
+          ctx.beginPath();
+          ctx.arc(tx, ty, dp.size * (1 - ti * 0.2), 0, Math.PI * 2);
+          ctx.fillStyle = dp.color + Math.floor(ta * 255).toString(16).padStart(2, '0');
+          ctx.fill();
+        }
+
+        // Main packet with glow
+        var pkGrd = ctx.createRadialGradient(px, py, 0, px, py, dp.size * 3);
+        pkGrd.addColorStop(0, dp.color + '80');
+        pkGrd.addColorStop(1, dp.color + '00');
+        ctx.fillStyle = pkGrd;
+        ctx.beginPath(); ctx.arc(px, py, dp.size * 3, 0, Math.PI * 2); ctx.fill();
+
+        ctx.beginPath(); ctx.arc(px, py, dp.size, 0, Math.PI * 2);
+        ctx.fillStyle = dp.color; ctx.fill();
+      }
+
+      // ── Center node ("YOU") — animated shield icon ──
+      var centerPulse = Math.sin(time / 500) * 5;
+
+      // Outer rotating ring
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(time / 4000);
+      ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 0.4);
+      ctx.strokeStyle = 'rgba(0,212,255,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 22, Math.PI, Math.PI * 1.4);
+      ctx.stroke();
+      ctx.restore();
+
+      // Second counter-rotating ring
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-time / 5000);
+      ctx.beginPath(); ctx.arc(0, 0, 28, Math.PI * 0.5, Math.PI * 0.9);
+      ctx.strokeStyle = 'rgba(0,212,255,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 28, Math.PI * 1.5, Math.PI * 1.9);
+      ctx.stroke();
+      ctx.restore();
+
+      // Glow
+      var cgrd = ctx.createRadialGradient(cx, cy, 3, cx, cy, 35 + centerPulse);
+      cgrd.addColorStop(0, '#00d4ff50');
+      cgrd.addColorStop(0.4, '#00d4ff15');
+      cgrd.addColorStop(1, '#00d4ff00');
+      ctx.fillStyle = cgrd;
+      ctx.beginPath(); ctx.arc(cx, cy, 35 + centerPulse, 0, Math.PI * 2); ctx.fill();
+
+      // Shield shape
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 10);
+      ctx.lineTo(cx + 8, cy - 5);
+      ctx.lineTo(cx + 8, cy + 3);
+      ctx.quadraticCurveTo(cx, cy + 11, cx, cy + 11);
+      ctx.quadraticCurveTo(cx, cy + 11, cx - 8, cy + 3);
+      ctx.lineTo(cx - 8, cy - 5);
+      ctx.closePath();
+      ctx.fillStyle = '#00d4ff'; ctx.fill();
+      ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // "YOU" label
+      ctx.font = 'bold 10px "Orbitron"';
+      ctx.fillStyle = '#00d4ff'; ctx.textAlign = 'center';
+      ctx.fillText('YOU', cx, cy - 22);
+      ctx.font = '8px "Share Tech Mono"';
+      ctx.fillStyle = 'rgba(200,220,232,0.5)';
+      ctx.fillText(mapNodes.length + ' endpoints', cx, cy + 30);
+      ctx.textAlign = 'left';
+
+      // ── Ping circles ──
+      for (var pi = pingCircles.length - 1; pi >= 0; pi--) {
+        var p = pingCircles[pi];
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        var alphaHex = Math.floor(p.alpha * 255).toString(16).padStart(2, '0');
+        ctx.strokeStyle = p.color + alphaHex;
+        ctx.lineWidth = 1.5; ctx.stroke();
+        // Inner fill
+        ctx.fillStyle = p.color + Math.floor(p.alpha * 80).toString(16).padStart(2, '0');
+        ctx.fill();
+        p.radius += 1;
+        p.alpha -= 0.018;
+        if (p.alpha <= 0) pingCircles.splice(pi, 1);
+      }
+
+      // ── Corner decorations ──
+      var cornerSize = 20;
+      ctx.strokeStyle = 'rgba(0,212,255,0.15)'; ctx.lineWidth = 1;
+      // Top-left
+      ctx.beginPath(); ctx.moveTo(5, 5 + cornerSize); ctx.lineTo(5, 5); ctx.lineTo(5 + cornerSize, 5); ctx.stroke();
+      // Top-right
+      ctx.beginPath(); ctx.moveTo(w - 5 - cornerSize, 5); ctx.lineTo(w - 5, 5); ctx.lineTo(w - 5, 5 + cornerSize); ctx.stroke();
+      // Bottom-left
+      ctx.beginPath(); ctx.moveTo(5, h - 5 - cornerSize); ctx.lineTo(5, h - 5); ctx.lineTo(5 + cornerSize, h - 5); ctx.stroke();
+      // Bottom-right
+      ctx.beginPath(); ctx.moveTo(w - 5 - cornerSize, h - 5); ctx.lineTo(w - 5, h - 5); ctx.lineTo(w - 5, h - 5 - cornerSize); ctx.stroke();
+
+      // ── Status text in corner ──
+      ctx.font = '8px "Share Tech Mono"';
+      ctx.fillStyle = 'rgba(0,212,255,0.25)';
+      ctx.textAlign = 'left';
+      ctx.fillText('LIVE NETWORK MAP', 12, 18);
+      ctx.textAlign = 'right';
+      var secText = new Date().toLocaleTimeString();
+      ctx.fillText(secText, w - 12, 18);
+      ctx.textAlign = 'left';
+
+      // ── Empty state ──
+      if (mapNodes.length === 0) {
+        ctx.font = '12px "Share Tech Mono"';
+        ctx.fillStyle = 'rgba(200,220,232,0.25)';
+        ctx.textAlign = 'center';
+        var dots = '.'.repeat(Math.floor((time / 500) % 4));
+        ctx.fillText('SCANNING NETWORK' + dots, cx, cy + 50);
+        ctx.textAlign = 'left';
+      }
+
+      requestAnimationFrame(drawMap);
+    }
+    requestAnimationFrame(drawMap);
+
+    // ── Backend polling ──
+    async function pollBackend() {
+      try {
+        var results = await Promise.all([
+          apiGet('/api/threats'),
+          apiGet('/api/actions'),
+          apiGet('/api/stats'),
+          apiGet('/api/events'),
+          apiGet('/api/connections'),
+          apiGet('/api/blocked-ips'),
+        ]);
+        var threats = results[0];
+        var actions = results[1];
+        var stats = results[2];
+        var events = results[3];
+        var connections = results[4];
+        var blocked = results[5];
+
+        if (threats) renderThreats(threats);
+
+        // Update map with live connections + threats + blocked IPs
+        updateMapFromConnections(connections, threats, blocked);
+        if (actions) renderActions(actions);
+        if (stats) applyStats(stats);
+
+        // Process events
+        if (events && events.length > 0) {
+          var newEvents = [];
+          for (var i = 0; i < events.length; i++) {
+            var ev = events[i];
+            var ts = ev.timestamp || '';
+            if (firstEventLoad || ts > lastEventTimestamp) {
+              newEvents.push(ev);
+            }
+          }
+          if (newEvents.length > 0) {
+            // Show newest last (reverse so prepend puts newest on top)
+            newEvents.sort(function(a, b) { return (a.timestamp || '').localeCompare(b.timestamp || ''); });
+            var showCount = firstEventLoad ? Math.min(newEvents.length, 20) : newEvents.length;
+            var toShow = newEvents.slice(newEvents.length - showCount);
+            toShow.forEach(function(ev) {
+              var tag = mapSeverityToTag(ev.severity || ev.event_type);
+              var msg = ev.message || ev.detail || '';
+              var time = (ev.timestamp || '').slice(11, 19) || nowTime();
+              addEventLine(time, tag, msg);
+            });
+            lastEventTimestamp = events[events.length - 1].timestamp || lastEventTimestamp;
+            firstEventLoad = false;
+          }
+        }
+      } catch (e) {
+        // Backend not available
+      }
+    }
+
+    // Poll every 3 seconds
+    setInterval(pollBackend, 3000);
+    setTimeout(pollBackend, 500);
+
+    // ── Process viewer ──
+    window.refreshProcesses = function() {
+      apiGet('/api/processes').then(function(data) {
+        if (data) {
+          processData = data;
+          renderProcessTable();
+        }
+      });
+    };
+
+    window.sortProcs = function(key) {
+      if (procSortKey === key) procSortAsc = !procSortAsc;
+      else { procSortKey = key; procSortAsc = true; }
+      renderProcessTable();
+    };
+
+    function renderProcessTable() {
+      var filter = (document.getElementById('proc-filter').value || '').toLowerCase();
+      var filtered = processData.filter(function(p) {
+        if (!filter) return true;
+        return (p.name || '').toLowerCase().includes(filter) ||
+               String(p.pid).includes(filter) ||
+               (p.exe_path || '').toLowerCase().includes(filter);
+      });
+
+      // Sort
+      filtered.sort(function(a, b) {
+        var va = a[procSortKey], vb = b[procSortKey];
+        if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+        if (va < vb) return procSortAsc ? -1 : 1;
+        if (va > vb) return procSortAsc ? 1 : -1;
+        return 0;
+      });
+
+      var tbody = document.getElementById('proc-tbody');
+      tbody.innerHTML = '';
+      document.getElementById('proc-count-label').textContent = filtered.length + ' processes';
+
+      filtered.forEach(function(p) {
+        var tr = document.createElement('tr');
+        if (p.suspicious) tr.className = 'suspicious';
+        tr.innerHTML =
+          '<td>' + p.pid + '</td>' +
+          '<td title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</td>' +
+          '<td>' + (p.cpu_percent || 0).toFixed(1) + '</td>' +
+          '<td>' + (p.memory_mb || 0).toFixed(1) + '</td>' +
+          '<td title="' + escapeHtml(p.exe_path) + '">' + escapeHtml(p.exe_path || '') + '</td>' +
+          '<td>' + escapeHtml(p.status || '') + '</td>' +
+          '<td><button class="proc-kill-btn" onclick="killProcess(' + p.pid + ',\'' + escapeHtml(p.name).replace(/'/g, "\\'") + '\')">KILL</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('proc-filter').addEventListener('input', renderProcessTable);
+
+    // ── Connection viewer ──
+    window.refreshConnections = function() {
+      apiGet('/api/connections').then(function(data) {
+        if (data) {
+          connectionData = data;
+          renderConnectionTable();
+        }
+      });
+    };
+
+    function renderConnectionTable() {
+      var filter = (document.getElementById('conn-filter').value || '').toLowerCase();
+      var filtered = connectionData.filter(function(c) {
+        if (!filter) return true;
+        return (c.remote || '').toLowerCase().includes(filter) ||
+               (c.local || '').toLowerCase().includes(filter) ||
+               (c.process || '').toLowerCase().includes(filter) ||
+               String(c.pid).includes(filter);
+      });
+
+      var tbody = document.getElementById('conn-tbody');
+      tbody.innerHTML = '';
+      document.getElementById('conn-count-label').textContent = filtered.length + ' connections';
+
+      filtered.forEach(function(c) {
+        var tr = document.createElement('tr');
+        var blockBtn = c.remote_ip ? '<button class="conn-block-btn" onclick="blockIP(\'' + escapeHtml(c.remote_ip) + '\')">BLOCK</button>' : '';
+        tr.innerHTML =
+          '<td>' + escapeHtml(c.local || '') + '</td>' +
+          '<td>' + escapeHtml(c.remote || '') + '</td>' +
+          '<td>' + escapeHtml(c.status || '') + '</td>' +
+          '<td>' + (c.pid || '') + '</td>' +
+          '<td>' + escapeHtml(c.process || '') + '</td>' +
+          '<td>' + blockBtn + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('conn-filter').addEventListener('input', renderConnectionTable);
+
+    // ── Quarantine viewer ──
+    window.refreshQuarantine = function() {
+      apiGet('/api/quarantine').then(function(data) {
+        var el = document.getElementById('quar-list');
+        if (!data || data.length === 0) {
+          el.innerHTML = '<div class="empty-placeholder">NO QUARANTINED FILES</div>';
+          document.getElementById('quar-count-label').textContent = '0 files';
+          return;
+        }
+        document.getElementById('quar-count-label').textContent = data.length + ' files';
+        el.innerHTML = '';
+        data.forEach(function(f) {
+          el.innerHTML +=
+            '<div class="quar-item">' +
+              '<div>📦</div>' +
+              '<div style="flex:1">' +
+                '<div class="quar-filename">' + escapeHtml(f.filename) + '</div>' +
+                '<div class="quar-detail">Original: ' + escapeHtml(f.original_path || 'Unknown') + '</div>' +
+                '<div class="quar-detail">SHA256: ' + escapeHtml((f.sha256 || '').substring(0, 16)) + '... | ' + escapeHtml(f.timestamp || '') + '</div>' +
+              '</div>' +
+            '</div>';
+        });
+      });
+    };
+
+    // ── Blocked IPs viewer ──
+    window.refreshBlockedIPs = function() {
+      apiGet('/api/blocked-ips').then(function(data) {
+        var el = document.getElementById('blocked-list');
+        if (!data || data.length === 0) {
+          el.innerHTML = '<div class="empty-placeholder">NO BLOCKED IPs</div>';
+          document.getElementById('blocked-count-label').textContent = '0 blocked';
+          return;
+        }
+        document.getElementById('blocked-count-label').textContent = data.length + ' blocked';
+        el.innerHTML = '';
+        data.forEach(function(ip) {
+          el.innerHTML +=
+            '<div class="blocked-ip-item">' +
+              '<span class="ip-addr">🔒 ' + escapeHtml(ip) + '</span>' +
+              '<button class="unblock-btn" onclick="unblockIP(\'' + escapeHtml(ip) + '\')">UNBLOCK</button>' +
+            '</div>';
+        });
+      });
+    };
+
+    // ── Manual actions (exposed globally) ──
+    window.killProcess = function(pid, name) {
+      if (!confirm('Kill process ' + (name || '') + ' (PID ' + pid + ')?')) return;
+      apiPost('/api/action/kill', { pid: pid, name: name || '' }).then(function(data) {
+        if (data.success) showToast('Killed process PID ' + pid, 'success');
+        else showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
+        pollBackend();
+      }).catch(function() { showToast('Request failed', 'error'); });
+    };
+
+    window.blockIP = function(ip) {
+      if (!confirm('Block IP ' + ip + '?')) return;
+      apiPost('/api/action/block', { ip: ip }).then(function(data) {
+        if (data.success) showToast('Blocked IP ' + ip, 'success');
+        else showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
+        pollBackend();
+        refreshBlockedIPs();
+      }).catch(function() { showToast('Request failed', 'error'); });
+    };
+
+    window.unblockIP = function(ip) {
+      if (!confirm('Unblock IP ' + ip + '?')) return;
+      apiPost('/api/action/unblock', { ip: ip }).then(function(data) {
+        if (data.success) showToast('Unblocked IP ' + ip, 'success');
+        else showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
+        pollBackend();
+        refreshBlockedIPs();
+      }).catch(function() { showToast('Request failed', 'error'); });
+    };
+
+    window.quarantineFile = function(path) {
+      if (!confirm('Quarantine file:\n' + path + '?')) return;
+      apiPost('/api/action/quarantine', { path: path }).then(function(data) {
+        if (data.success) showToast('Quarantined: ' + path, 'success');
+        else showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
+        pollBackend();
+        refreshQuarantine();
+      }).catch(function() { showToast('Request failed', 'error'); });
+    };
+
+    window.manualBlockIP = function() {
+      var input = document.getElementById('manual-ip-input');
+      var ip = input.value.trim();
+      if (!ip) return;
+      blockIP(ip);
+      input.value = '';
+    };
+
+    window.manualBlockIPFromTab = function() {
+      var input = document.getElementById('blocked-ip-input');
+      var ip = input.value.trim();
+      if (!ip) return;
+      blockIP(ip);
+      input.value = '';
+    };
+
+    // Enter key on IP inputs
+    document.getElementById('manual-ip-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') manualBlockIP();
+    });
+    document.getElementById('blocked-ip-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') manualBlockIPFromTab();
+    });
+
+  })();
+  </script>
+</body>
+</html>

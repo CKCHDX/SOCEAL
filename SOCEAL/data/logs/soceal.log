@@ -1,0 +1,135 @@
+2026-03-28 12:40:11 [soceal.utils.logging] INFO: Logging initialized — log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 12:40:11 [soceal.main] INFO: SOCeal starting — SAFE MODE (monitor only)
+2026-03-28 12:40:11 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 12:40:11 [soceal.sensors.eventlog] INFO: EventLogSensor started — monitoring: Security, System, Application
+2026-03-28 12:40:11 [soceal.sensors.eventlog] INFO: Opened event log: Security
+2026-03-28 12:40:11 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 12:40:11 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 12:40:11 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 12:40:11 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 12:40:11 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 12:40:11 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 12:40:11 [soceal.sensors.file] INFO: FileMonitor started — watching 3 directories
+2026-03-28 12:40:11 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 12:40:12 [soceal.ui.dashboard] INFO: Opened dashboard in browser: http://127.0.0.1:8081
+2026-03-28 12:40:12 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 12:40:40 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 12:45:53 [soceal.utils.logging] INFO: Logging initialized — log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 12:45:53 [soceal.main] INFO: SOCeal starting — SAFE MODE (monitor only)
+2026-03-28 12:45:53 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 12:45:53 [soceal.sensors.eventlog] INFO: EventLogSensor started — monitoring: Security, System, Application
+2026-03-28 12:45:53 [soceal.sensors.eventlog] INFO: Opened event log: Security
+2026-03-28 12:45:53 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 12:45:53 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 12:45:53 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 12:45:53 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 12:45:53 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 12:45:53 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 12:45:53 [soceal.sensors.file] INFO: FileMonitor started — watching 3 directories
+2026-03-28 12:45:53 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 12:45:54 [soceal.ui.dashboard] INFO: Opened dashboard in browser: http://127.0.0.1:8081
+2026-03-28 12:45:54 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 12:45:56 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 12:46:01 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 12:46:02 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 12:46:05 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:50:28 [soceal.utils.logging] INFO: Logging initialized -- log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 13:50:28 [soceal.main] INFO: SOCeal starting -- SAFE MODE (monitor only)
+2026-03-28 13:50:28 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 13:50:28 [soceal.sensors.eventlog] INFO: EventLogSensor started -- monitoring: Security, System, Application
+2026-03-28 13:50:28 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 13:50:28 [soceal.sensors.eventlog] WARNING: Cannot open event log 'Security': (1314, 'OpenEventLogW', 'Klienten saknar ett nödvändigt privilegium.') (may require admin)
+2026-03-28 13:50:28 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 13:50:28 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 13:50:28 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 13:50:28 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 13:50:28 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 13:50:28 [soceal.sensors.file] INFO: FileMonitor started -- watching 3 directories
+2026-03-28 13:50:28 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 13:50:29 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 13:52:40 [soceal.utils.logging] INFO: Logging initialized -- log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 13:52:40 [soceal.main] INFO: SOCeal starting -- SAFE MODE (monitor only)
+2026-03-28 13:52:40 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 13:52:40 [soceal.sensors.eventlog] INFO: EventLogSensor started -- monitoring: Security, System, Application
+2026-03-28 13:52:40 [soceal.sensors.eventlog] WARNING: Cannot open event log 'Security': (1314, 'OpenEventLogW', 'Klienten saknar ett nödvändigt privilegium.') (may require admin)
+2026-03-28 13:52:40 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 13:52:40 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 13:52:40 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 13:52:40 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 13:52:40 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 13:52:40 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 13:52:40 [soceal.sensors.file] INFO: FileMonitor started -- watching 3 directories
+2026-03-28 13:52:40 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 13:52:57 [soceal.ui.dashboard] INFO: Opened dashboard in browser: http://127.0.0.1:8081
+2026-03-28 13:52:57 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 13:53:06 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:53:13 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:53:21 [soceal.sensors.file] WARNING: Suspicious file event: Suspicious file created: __PSScriptPolicyTest_bh0y3l33.nn2.ps1 (.ps1)
+2026-03-28 13:53:21 [soceal.rules.engine] WARNING: Rule triggered: SUSPICIOUS_DOWNLOAD (severity=high, action=quarantine)
+2026-03-28 13:53:21 [soceal.sensors.file] WARNING: Suspicious file event: Suspicious file modified: __PSScriptPolicyTest_bh0y3l33.nn2.ps1 (.ps1)
+2026-03-28 13:53:21 [soceal.rules.engine] INFO: SAFE MODE: Would execute 'quarantine' but safe_mode is ON -- logging only
+2026-03-28 13:53:21 [soceal.sensors.file] WARNING: Suspicious file event: Suspicious file created: __PSScriptPolicyTest_p3hn4gov.ipy.ps1 (.ps1)
+2026-03-28 13:53:21 [soceal.rules.actions] INFO: LOG [SUSPICIOUS_DOWNLOAD/high]: [SAFE MODE] Rule SUSPICIOUS_DOWNLOAD triggered -- action 'quarantine' suppressed
+2026-03-28 13:53:21 [soceal.sensors.file] WARNING: Suspicious file event: Suspicious file modified: __PSScriptPolicyTest_p3hn4gov.ipy.ps1 (.ps1)
+2026-03-28 13:53:21 [soceal.rules.engine] WARNING: Rule triggered: SUSPICIOUS_DOWNLOAD (severity=high, action=quarantine)
+2026-03-28 13:53:22 [soceal.rules.engine] INFO: SAFE MODE: Would execute 'quarantine' but safe_mode is ON -- logging only
+2026-03-28 13:53:22 [soceal.rules.actions] INFO: LOG [SUSPICIOUS_DOWNLOAD/high]: [SAFE MODE] Rule SUSPICIOUS_DOWNLOAD triggered -- action 'quarantine' suppressed
+2026-03-28 13:53:22 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:53:22 [soceal.rules.engine] WARNING: Rule triggered: SUSPICIOUS_DOWNLOAD (severity=high, action=quarantine)
+2026-03-28 13:53:22 [soceal.rules.engine] INFO: SAFE MODE: Would execute 'quarantine' but safe_mode is ON -- logging only
+2026-03-28 13:53:22 [soceal.rules.actions] INFO: LOG [SUSPICIOUS_DOWNLOAD/high]: [SAFE MODE] Rule SUSPICIOUS_DOWNLOAD triggered -- action 'quarantine' suppressed
+2026-03-28 13:53:22 [soceal.rules.engine] WARNING: Rule triggered: SUSPICIOUS_DOWNLOAD (severity=high, action=quarantine)
+2026-03-28 13:53:22 [soceal.rules.engine] INFO: SAFE MODE: Would execute 'quarantine' but safe_mode is ON -- logging only
+2026-03-28 13:53:22 [soceal.rules.actions] INFO: LOG [SUSPICIOUS_DOWNLOAD/high]: [SAFE MODE] Rule SUSPICIOUS_DOWNLOAD triggered -- action 'quarantine' suppressed
+2026-03-28 13:53:32 [soceal.utils.logging] INFO: Logging initialized -- log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 13:53:32 [soceal.main] INFO: SOCeal starting -- SAFE MODE (monitor only)
+2026-03-28 13:53:32 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 13:53:32 [soceal.sensors.eventlog] INFO: EventLogSensor started -- monitoring: Security, System, Application
+2026-03-28 13:53:32 [soceal.sensors.eventlog] WARNING: Cannot open event log 'Security': (1314, 'OpenEventLogW', 'Klienten saknar ett nödvändigt privilegium.') (may require admin)
+2026-03-28 13:53:32 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 13:53:32 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 13:53:32 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 13:53:32 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 13:53:32 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 13:53:32 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 13:53:32 [soceal.sensors.file] INFO: FileMonitor started -- watching 3 directories
+2026-03-28 13:53:32 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 13:53:33 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 13:53:35 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:53:49 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:58:19 [soceal.utils.logging] INFO: Logging initialized -- log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 13:58:19 [soceal.main] INFO: SOCeal starting -- SAFE MODE (monitor only)
+2026-03-28 13:58:19 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 13:58:19 [soceal.sensors.eventlog] INFO: EventLogSensor started -- monitoring: Security, System, Application
+2026-03-28 13:58:19 [soceal.sensors.eventlog] WARNING: Cannot open event log 'Security': (1314, 'OpenEventLogW', 'Klienten saknar ett nödvändigt privilegium.') (may require admin)
+2026-03-28 13:58:19 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 13:58:19 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 13:58:19 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 13:58:19 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 13:58:19 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 13:58:19 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 13:58:19 [soceal.sensors.file] INFO: FileMonitor started -- watching 3 directories
+2026-03-28 13:58:19 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 13:58:38 [soceal.ui.dashboard] INFO: Opened dashboard in browser: http://127.0.0.1:8081
+2026-03-28 13:58:38 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 13:58:50 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:58:58 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:59:07 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:59:20 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 13:59:20 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range
+2026-03-28 14:01:04 [soceal.utils.logging] INFO: Logging initialized -- log dir: C:\Users\akoj2\Desktop\SOCEAL\data\logs
+2026-03-28 14:01:04 [soceal.main] INFO: SOCeal starting -- SAFE MODE (monitor only)
+2026-03-28 14:01:04 [soceal.rules.engine] INFO: Loaded 10 rules from C:\Users\akoj2\Desktop\SOCEAL\config\rules.json
+2026-03-28 14:01:04 [soceal.sensors.eventlog] INFO: EventLogSensor started -- monitoring: Security, System, Application
+2026-03-28 14:01:04 [soceal.sensors.eventlog] INFO: Opened event log: Security
+2026-03-28 14:01:04 [soceal.sensors.process] INFO: ProcessMonitor started (interval=5s)
+2026-03-28 14:01:04 [soceal.sensors.eventlog] INFO: Opened event log: System
+2026-03-28 14:01:04 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\Downloads
+2026-03-28 14:01:04 [soceal.sensors.eventlog] INFO: Opened event log: Application
+2026-03-28 14:01:04 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Local\Temp
+2026-03-28 14:01:04 [soceal.sensors.file] INFO: Watching directory: C:\Users\akoj2\AppData\Roaming
+2026-03-28 14:01:04 [soceal.sensors.file] INFO: FileMonitor started -- watching 3 directories
+2026-03-28 14:01:04 [soceal.ui.server] INFO: RealtimeServer started at http://127.0.0.1:8081
+2026-03-28 14:01:05 [soceal.ui.dashboard] INFO: Opened dashboard in browser: http://127.0.0.1:8081
+2026-03-28 14:01:05 [soceal.main] INFO: SOCeal is running. Press Ctrl+C to stop.
+2026-03-28 14:01:16 [soceal.ui.server] ERROR: blocked-ips API error: list index out of range

@@ -48,25 +48,32 @@ echo  [OK] Entry point: %MAIN%
 :: --- Install / verify dependencies ----------------------------------
 echo.
 echo  [..] Checking dependencies...
-%PYTHON% -m pip install --quiet --upgrade pip >nul 2>&1
-%PYTHON% -m pip install --quiet -r "%ROOT%requirements.txt"
-if %errorlevel% neq 0 (
-    echo  [WARN] Some packages may have failed. Continuing...
-)
-echo  [OK] Dependencies ready.
 
-:: --- Admin check ----------------------------------------------------
+:: Run pip in a subprocess so its output NEVER touches cmd's parser.
+:: Redirect both stdout and stderr to nul.
+%PYTHON% -m pip install --quiet --upgrade pip >nul 2>nul
+%PYTHON% -m pip install --quiet -r "%ROOT%requirements.txt" >nul 2>nul
+
+:: Check errorlevel only AFTER pip has fully finished and output is gone.
+if %errorlevel% neq 0 (
+    echo  [WARN] Some packages may have failed. Continuing anyway...
+    echo  Run manually: pip install -r requirements.txt
+) else (
+    echo  [OK] Dependencies ready.
+)
+
+:: --- Admin check -----------------------------------------------------
 net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo.
     echo  [WARN] Not running as Administrator.
-    echo  Active mode (firewall rules, process kill) requires Admin.
+    echo  Active mode requires Admin for firewall and process kill.
     echo  Safe mode will still work fully.
     echo.
     timeout /t 3 /nobreak >nul
 )
 
-:: --- Mode selection -------------------------------------------------
+:: --- Mode selection --------------------------------------------------
 echo.
 echo  Select launch mode:
 echo  [1] Safe Mode   - Monitor and detect only  (recommended)
@@ -95,7 +102,7 @@ echo  Dashboard: http://127.0.0.1:8081
 echo  Press Ctrl+C in this window to stop SOCeal.
 echo.
 
-:: --- Launch ---------------------------------------------------------
+:: --- Launch ----------------------------------------------------------
 cd /d "%ROOT%SOCEAL\src"
 %PYTHON% "%MAIN%" %ARGS%
 
